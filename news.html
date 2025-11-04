@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GoldRates News</title>
+<link rel="icon" href="assets/favicon.png" />
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<div class="max-w-7xl mx-auto px-4 md:px-6 py-10">
+  <h1 class="text-3xl font-bold">News</h1>
+  <div id="list" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-6"></div>
+</div>
+<script>
+const API = localStorage.getItem('goldrates_api') || 'http://localhost:4000';
+
+function card(p){
+  const d = new Date(p.publishedAt || p.createdAt);
+  const img = p.coverImage ? `<img src="${p.coverImage}" alt="" class="w-full h-40 object-cover rounded-xl mb-3">` : '';
+  return `<article class="card p-5 overflow-hidden">
+    ${img}
+    <div class="text-xs text-gray-500">${d.toLocaleDateString()}</div>
+    <h3 class="mt-1 font-semibold">${p.title}</h3>
+    <p class="text-sm text-gray-600 mt-1 line-clamp-3">${p.excerpt || ''}</p>
+    <a class="inline-block mt-3 text-sm text-amber-600" href="?slug=${encodeURIComponent(p.slug)}">Read →</a>
+  </article>`;
+}
+
+async function init(){
+  const params = new URLSearchParams(location.search);
+  const slug = params.get('slug');
+  const el = document.getElementById('list');
+
+  if (slug){
+    const r = await fetch(`${API}/posts/${slug}`);
+    const p = await r.json();
+    if (!r.ok) { el.innerHTML = '<div class="text-sm text-gray-500">Not found.</div>'; return; }
+    el.outerHTML = `<article class="max-w-3xl mx-auto px-4 md:px-0">
+      <div class="text-xs text-gray-500">${new Date(p.publishedAt||p.createdAt).toLocaleString()}</div>
+      <h1 class="text-3xl font-bold mt-1">${p.title}</h1>
+      ${p.coverImage ? `<img src="${p.coverImage}" alt="" class="w-full h-64 object-cover rounded-2xl mt-4">` : ''}
+      <div class="prose max-w-none mt-4">${p.content || ''}</div>
+    </article>`;
+  } else {
+    const r = await fetch(`${API}/posts?type=news&limit=30`);
+    const { items=[] } = await r.json();
+    el.innerHTML = items.map(card).join('') || '<div class="text-sm text-gray-500">No posts yet.</div>';
+  }
+}
+init();
+</script>
+</body>
+</html>

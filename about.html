@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GoldRates.com — Live Gold Prices & Calculator</title>
+  <meta name="description" content="Real-time gold prices across karats with currency converter and price calculator.">
+  <link rel="icon" href="assets/favicon.ico">
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind config (optional)
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { 500: '#f59e0b', 600: '#d97706' } }}},
+    };
+  </script>
+  <style>
+    .card { @apply rounded-2xl shadow-sm border border-gray-100 bg-white; }
+    .badge-up { @apply inline-flex items-center text-green-700 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium; }
+    .badge-down { @apply inline-flex items-center text-red-700 bg-red-50 px-2 py-0.5 rounded-full text-xs font-medium; }
+    .stat { @apply text-gray-500 text-xs; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 font-semibold">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+        GoldRates<span class="text-amber-500">.com</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a class="hover:text-amber-600" href="index.html">Live Rates</a>
+        <a class="hover:text-amber-600" href="about.html">About</a>
+        <a class="hover:text-amber-600" href="contact.html">Contact</a>
+      </nav>
+      <a href="#alerts" class="text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded-lg text-sm">Get Alerts</a>
+    </div>
+  </header>
+  <main class="max-w-3xl mx-auto px-4 md:px-6 py-12">
+    <h1 class="text-3xl font-bold">About GoldRates.com</h1>
+    <p class="mt-4 text-gray-600">We provide accurate, real-time gold prices and expert insights to help individuals, investors, and traders make informed decisions.</p>
+  </main>
+  <footer class="mt-16 border-t border-gray-200 bg-white">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-10 grid gap-6 md:grid-cols-4">
+      <div>
+        <div class="font-semibold mb-2">GoldRates.com</div>
+        <p class="text-sm text-gray-500">Your trusted source for real-time gold prices and market insights.</p>
+      </div>
+      <div>
+        <div class="font-semibold mb-2">Products</div>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li><a href="index.html" class="hover:text-amber-600">Live Rates</a></li>
+          <li><a href="index.html#calculator" class="hover:text-amber-600">Price Calculator</a></li>
+          <li><a href="#" class="hover:text-amber-600">Historical Data</a></li>
+          <li><a href="#" class="hover:text-amber-600">Market Analysis</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-semibold mb-2">Resources</div>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li><a href="#" class="hover:text-amber-600">Gold News</a></li>
+          <li><a href="#" class="hover:text-amber-600">Market Reports</a></li>
+          <li><a href="#" class="hover:text-amber-600">Investment Guide</a></li>
+          <li><a href="#" class="hover:text-amber-600">API Documentation</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-semibold mb-2">Company</div>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li><a href="about.html" class="hover:text-amber-600">About Us</a></li>
+          <li><a href="contact.html" class="hover:text-amber-600">Contact</a></li>
+          <li><a href="#" class="hover:text-amber-600">Privacy Policy</a></li>
+          <li><a href="#" class="hover:text-amber-600">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="text-center text-xs text-gray-500 pb-8">© 2025 GoldRates.com. All rights reserved.</div>
+  </footer>
+  <script src="js/main.js"></script>
+</body>
+</html>
