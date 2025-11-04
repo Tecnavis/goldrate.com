@@ -1,440 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GoldRates Admin</title>
-<link rel="icon" href="assets/favicon.png" />
-<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<meta name="gold-api" content="https://goldrate-cms.onrender.com" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GoldRates Admin</title>
+  <link rel="icon" href="assets/favicon.png" />
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Point this to your live CMS base URL -->
+  <meta name="gold-api" content="http://localhost:8080" />
+  <style>
+    html, body { height:100%; }
+    .page { min-height:100%; display:flex; flex-direction:column; }
+    footer { margin-top:auto; }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
-<div class="max-w-7xl mx-auto p-6">
-  <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-bold">GOLDRATES.COM ADMIN</h1>
-    <div class="flex items-center gap-3">
-      <span id="whoami" class="text-sm text-gray-500"></span>
-      <button id="btn-logout" class="hidden text-sm px-3 py-1.5 rounded-lg border">Logout</button>
-    </div>
-  </div>
-
-  <!-- LOGIN -->
-  <div id="card-login" class="mt-6 grid md:grid-cols-2 gap-6 items-stretch">
-    <div class="hidden md:block relative rounded-2xl overflow-hidden border bg-white h-58">
-  <img src="./assets/123.jpeg" class="absolute inset-0 w-full h-full object-cover" alt="Gold market" />
-  <div class="absolute inset-0 bg-gradient-to-tr from-black/40 to-black/10"></div>
-
-  <div class="absolute inset-0 flex items-end p-6 text-white">
-    <div>
-      <div class="text-lg font-semibold">Welcome back</div>
-      <div class="text-sm text-white/80">Manage posts, media and users securely.</div>
-    </div>
-  </div>
-</div>
-
-    <div class="card p-6 rounded-2xl border bg-white shadow-sm">
-      <div class="text-sm text-gray-500 mb-2">Login</div>
-      <div class="grid gap-3">
-        <input id="a-email" class="border rounded-lg px-3 py-2 text-sm" placeholder="Email" />
-        <input id="a-pass" type="password" class="border rounded-lg px-3 py-2 text-sm" placeholder="Password" />
-        <button id="a-login" class="bg-amber-500 text-white px-4 py-2 rounded-lg">Login</button>
+<div class="page">
+  <header class="border-b bg-white">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <h1 class="text-xl font-bold">GOLDRATES.COM ADMIN</h1>
+      <div class="flex items-center gap-3">
+        <img src="assets/admin-login.png" alt="Admin" class="h-8 w-8 rounded-full ring-2 ring-gray-200 object-cover" onerror="this.src='assets/favicon.png'">
+        <button id="logoutBtn" class="text-sm px-3 py-1.5 rounded-lg bg-gray-900 text-white">Logout</button>
       </div>
-      <div id="a-status" class="text-xs text-gray-500 mt-3"></div>
     </div>
-  </div>
+  </header>
 
-  <!-- APP -->
-  <div id="app" class="hidden mt-6">
-    <!-- Tabs -->
-    <div class="flex flex-wrap gap-2">
-      <button data-tab="tab-cms" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">CMS Editor</button>
-      <button data-tab="tab-posts" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">Posts Table</button>
-      <button data-tab="tab-gallery" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">Gallery</button>
-      <button data-tab="tab-users" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">Users</button>
-    </div>
-
-    <!-- CMS EDITOR -->
-    <section id="tab-cms" class="tab-pane mt-4 card p-5 rounded-2xl border bg-white">
-      <div class="flex items-center justify-between">
-        <div class="text-sm text-gray-500">Create / Edit Post</div>
-        <button id="btn-new" class="text-sm text-amber-600">+ New</button>
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <!-- LOGIN CARD -->
+    <section id="loginCard" class="max-w-md mx-auto bg-white border rounded-2xl p-6 hidden">
+      <div class="flex items-center gap-3 mb-4">
+        <img src="assets/admin-login.png" class="h-10 w-10 rounded-full" onerror="this.src='assets/favicon.png'">
+        <h2 class="text-lg font-semibold">Admin Sign In</h2>
       </div>
-      <div class="grid gap-3 mt-3">
-        <input type="hidden" id="p-id" />
-        <div class="grid sm:grid-cols-2 gap-3">
-          <select id="p-type" class="border rounded-lg px-3 py-2 text-sm">
-            <option value="blog">Blog</option>
-            <option value="news">News</option>
-          </select>
-          <label class="text-sm inline-flex items-center gap-2">
-            <input id="p-published" type="checkbox" class="h-4 w-4"> Publish now
-          </label>
-        </div>
-        <input id="p-title" class="border rounded-lg px-3 py-2 text-sm" placeholder="Title" />
-        <input id="p-excerpt" class="border rounded-lg px-3 py-2 text-sm" placeholder="Short excerpt" />
+      <div class="space-y-3">
+        <input id="loginEmail" type="email" class="w-full border rounded-lg px-3 py-2" placeholder="Email">
+        <input id="loginPassword" type="password" class="w-full border rounded-lg px-3 py-2" placeholder="Password">
+        <button id="loginBtn" class="w-full bg-amber-500 text-white rounded-lg py-2 font-medium">Sign In</button>
+      </div>
+    </section>
+
+    <!-- BLOG/NEWS FORM -->
+    <section class="bg-white border rounded-2xl p-6 mb-6" id="postFormSection">
+      <h2 class="text-lg font-semibold mb-4">Create Post (News/Blog)</h2>
+      <div class="grid sm:grid-cols-2 gap-4 mb-4">
+        <select id="p-type" class="border rounded-lg px-3 py-2">
+          <option value="news">News</option>
+          <option value="blog">Blog</option>
+        </select>
+        <label class="inline-flex items-center gap-2 text-sm">
+          <input id="p-published" type="checkbox" class="h-4 w-4">
+          <span>Publish now</span>
+        </label>
+      </div>
+      <input id="p-title" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Title">
+      <input id="p-excerpt" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Short excerpt">
+      <div class="mb-3">
+        <div class="text-sm text-gray-600 mb-1">Content</div>
+        <div id="quill" class="bg-white rounded-lg border"></div>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4 mb-4">
         <div>
-          <div class="text-sm text-gray-600 mb-1">Content</div>
-          <div id="quill" class="bg-white rounded-lg border"></div>
+          <div class="text-sm text-gray-600 mb-1">Cover Image (Upload)</div>
+          <input id="p-image-file" type="file" accept="image/*" class="w-full text-sm" />
         </div>
-        <div class="grid sm:grid-cols-2 gap-3">
-          <div>
-            <label class="text-sm text-gray-600">Cover Image (Upload to DB)</label>
-            <input id="p-image-file" type="file" accept="image/*" class="mt-1 w-full text-sm" />
-            <button id="p-upload" type="button" class="mt-2 bg-amber-500 text-white px-3 py-2 rounded-lg">Upload Image</button>
-          </div>
-          <div>
-            <label class="text-sm text-gray-600">Or Image URL</label>
-            <input id="p-image-url" class="mt-1 w-full border rounded-lg px-3 py-2 text-sm" placeholder="https://..." />
-          </div>
+        <div>
+          <div id="imgPreview" class="aspect-video border rounded-lg bg-gray-50 flex items-center justify-center text-xs text-gray-400">Preview</div>
         </div>
-        <img id="p-image-preview" class="hidden mt-3 w-full h-48 object-cover rounded-xl" alt="Preview" />
-        <div class="flex items-center gap-4">
-          <button id="p-save" class="bg-amber-600 text-white px-4 py-2 rounded-lg">Save Post</button>
-          <div id="p-status" class="text-xs text-gray-500"></div>
-        </div>
+      </div>
+      <button id="savePost" class="bg-green-600 text-white rounded-lg px-4 py-2 font-medium">Save Post</button>
+      <p class="text-xs text-gray-500 mt-2">If “Publish now” is not ticked, the post will be saved as <b>Draft</b> and shown that way in the table below.</p>
+    </section>
+
+    <!-- USER CREATION (comes just below blog form) -->
+    <section class="bg-white border rounded-2xl p-6 mb-6" id="userCreateSection">
+      <h2 class="text-lg font-semibold mb-4">Create User</h2>
+      <div class="grid sm:grid-cols-3 gap-3">
+        <input id="u-name" class="border rounded-lg px-3 py-2" placeholder="Name">
+        <input id="u-email" type="email" class="border rounded-lg px-3 py-2" placeholder="Email">
+        <input id="u-password" type="text" class="border rounded-lg px-3 py-2" placeholder="Password">
+      </div>
+      <div class="mt-3">
+        <button id="createUser" class="bg-blue-600 text-white rounded-lg px-4 py-2">Create User</button>
       </div>
     </section>
 
     <!-- POSTS TABLE -->
-    <section id="tab-posts" class="tab-pane hidden mt-4 card p-5 rounded-2xl border bg-white">
-      <div class="flex items-center justify-between mb-3">
-        <div class="text-sm text-gray-500">All Posts</div>
-        <div class="flex items-center gap-2">
-          <select id="f-type" class="border rounded-lg px-3 py-2 text-sm">
-            <option value="">All</option>
-            <option value="blog">Blog</option>
-            <option value="news">News</option>
-          </select>
-          <input id="f-q" class="border rounded-lg px-3 py-2 text-sm" placeholder="Search..." />
-          <button id="f-refresh" class="px-3 py-2 rounded-lg border text-sm">Refresh</button>
-        </div>
+    <section class="bg-white border rounded-2xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Posts</h2>
+        <button id="refreshPosts" class="text-sm px-3 py-1.5 rounded-lg border">Refresh</button>
       </div>
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-          <thead>
-            <tr class="text-left text-gray-500">
-              <th class="py-2 pr-4">Title</th>
-              <th class="py-2 pr-4">Type</th>
-              <th class="py-2 pr-4">Status</th>
-              <th class="py-2 pr-4">Updated</th>
-              <th class="py-2 pr-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="t-body"></tbody>
-        </table>
-      </div>
-      <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
-        <div id="t-info"></div>
-      </div>
-    </section>
-
-    <!-- GALLERY -->
-    <section id="tab-gallery" class="tab-pane hidden mt-4 card p-5 rounded-2xl border bg-white">
-      <div class="flex items-center justify-between">
-        <div class="text-sm text-gray-500">Media (GridFS)</div>
-        <button id="g-refresh" class="px-3 py-2 rounded-lg border text-sm">Refresh</button>
-      </div>
-      <div id="gallery" class="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 mt-3"></div>
-    </section>
-
-    <!-- USERS -->
-    <section id="tab-users" class="tab-pane hidden mt-4 card p-5 rounded-2xl border bg-white">
-      <div class="flex items-center justify-between mb-3">
-        <div class="text-sm text-gray-500">Users</div>
-        <button id="u-refresh" class="px-3 py-2 rounded-lg border text-sm">Refresh</button>
-      </div>
-      <div class="grid sm:grid-cols-4 gap-3 mb-3">
-        <input id="u-email" class="border rounded-lg px-3 py-2 text-sm" placeholder="Email" />
-        <input id="u-name" class="border rounded-lg px-3 py-2 text-sm" placeholder="Name" />
-        <select id="u-role" class="border rounded-lg px-3 py-2 text-sm">
-          <option value="editor">Editor</option>
-          <option value="admin">Admin</option>
-        </select>
-        <input id="u-pass" class="border rounded-lg px-3 py-2 text-sm" placeholder="Temp password" />
-      </div>
-      <button id="u-create" class="bg-amber-600 text-white px-4 py-2 rounded-lg mb-3">Create User</button>
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead>
-            <tr class="text-left text-gray-500">
-              <th class="py-2 pr-4">Email</th>
-              <th class="py-2 pr-4">Name</th>
-              <th class="py-2 pr-4">Role</th>
-              <th class="py-2 pr-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="u-body"></tbody>
+          <thead><tr class="text-left border-b">
+            <th class="py-2 pr-3">Title</th>
+            <th class="py-2 pr-3">Type</th>
+            <th class="py-2 pr-3">Status</th>
+            <th class="py-2 pr-3">Created</th>
+          </tr></thead>
+          <tbody id="postsTbody"></tbody>
         </table>
       </div>
     </section>
-  </div>
+  </main>
+
+  <footer class="bg-white border-t">
+    <div class="max-w-6xl mx-auto px-4 py-4 text-xs text-gray-600 flex items-center justify-between">
+      <span>© goldrates.com</span>
+      <span>design and development by <a class="underline" href="https://tecnavis.in" target="_blank" rel="noopener">tecnavis.in</a></span>
+    </div>
+  </footer>
 </div>
-<footer class="fixed bottom-0 left-0 w-full border-t border-gray-200 bg-white py-3 text-center text-xs text-gray-600 shadow">
-  © 2025 GoldRates.com — Design & Development by 
-  <a href="https://tecnavis.in" target="_blank" class="text-amber-600 hover:underline">
-    Tecnavis.in
-  </a>
-</footer>
 
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
-const API = 'https://goldrate-cms.onrender.com';
-let TOKEN = localStorage.getItem('goldrates_token') || '';
-let COVER_URL = '';
-let quill;
+const API = document.querySelector('meta[name=gold-api]').content;
+let token = localStorage.getItem('gr_token') || '';
 
-// Tabs
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const target = btn.getAttribute('data-tab');
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
-    document.getElementById(target).classList.remove('hidden');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('bg-amber-50','border-amber-300','text-amber-700'));
-    btn.classList.add('bg-amber-50','border-amber-300','text-amber-700');
-  });
+const loginCard = document.getElementById('loginCard');
+const logoutBtn = document.getElementById('logoutBtn');
+
+function setAuthUI() {
+  if (!token) {
+    loginCard.classList.remove('hidden');
+  } else {
+    loginCard.classList.add('hidden');
+  }
+}
+setAuthUI();
+
+document.getElementById('loginBtn')?.addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const r = await fetch(API + '/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password }) });
+  const data = await r.json();
+  if (data.token) {
+    token = data.token;
+    localStorage.setItem('gr_token', token);
+    setAuthUI();
+    loadPosts();
+  } else {
+    alert(data.error || 'Login failed');
+  }
 });
 
-function showApp(){
-  document.getElementById('card-login').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('btn-logout').classList.remove('hidden');
-  document.querySelector('[data-tab="tab-cms"]').click();
-}
-function showLogin(){
-  document.getElementById('card-login').classList.remove('hidden');
-  document.getElementById('app').classList.add('hidden');
-  document.getElementById('btn-logout').classList.add('hidden');
+logoutBtn.addEventListener('click', () => {
+  token = '';
+  localStorage.removeItem('gr_token');
+  setAuthUI();
+});
+
+const quill = new Quill('#quill', { theme: 'snow' });
+
+// Preview image
+document.getElementById('p-image-file').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  const box = document.getElementById('imgPreview');
+  if (!file) { box.textContent = 'Preview'; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    box.innerHTML = '<img src=\"' + reader.result + '\" class=\"w-full h-full object-cover rounded-lg\">';
+  };
+  reader.readAsDataURL(file);
+});
+
+async function uploadFile(file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  const r = await fetch(API + '/api/uploads', { method:'POST', headers:{ 'Authorization': 'Bearer ' + token }, body: fd });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || 'Upload failed');
+  return data.fileId;
 }
 
-document.getElementById('btn-logout').onclick = () => {
-  localStorage.removeItem('goldrates_token'); TOKEN=''; location.reload();
-};
+document.getElementById('savePost').addEventListener('click', async () => {
+  const type = document.getElementById('p-type').value;
+  const title = document.getElementById('p-title').value.trim();
+  const excerpt = document.getElementById('p-excerpt').value.trim();
+  const published = document.getElementById('p-published').checked; // if not ticked -> draft (false)
+  const delta = quill.getContents();
+  const content = JSON.stringify(delta);
 
-function initQuill(html=''){
-  if (quill){ quill.root.innerHTML = html; return; }
-  quill = new Quill('#quill', { theme: 'snow' });
-  quill.root.innerHTML = html;
-}
-
-async function tryResume(){
-  const who = document.getElementById('whoami');
-  if (!TOKEN) return showLogin();
-  try{
-    const r = await fetch(`${API}/auth/me`, { headers: { Authorization: 'Bearer ' + TOKEN } });
-    if (!r.ok) return showLogin();
-    const j = await r.json();
-    who.textContent = (j.user?.email || '') + (j.user?.role ? ' ('+j.user.role+')' : '');
-    showApp();
-    initQuill('');
-    refreshTable(); refreshGallery(); refreshUsersCard(j.user?.role);
-  }catch{ showLogin(); }
-}
-tryResume();
-
-async function login(){
-  const email = document.getElementById('a-email').value.trim();
-  const password = document.getElementById('a-pass').value;
-  const out = document.getElementById('a-status');
-  out.textContent = 'Logging in...';
-  try{
-    const r = await fetch(`${API}/auth/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email, password })});
-    const j = await r.json();
-    if (r.ok){ TOKEN = j.token; localStorage.setItem('goldrates_token', TOKEN); location.reload(); }
-    else out.textContent = j.error || 'Login failed';
-  }catch(e){ out.textContent = 'Network error'; }
-}
-document.getElementById('a-login').onclick = login;
-
-// Upload to GridFS
-document.getElementById('p-upload').onclick = async () => {
+  let coverImageId = null;
   const file = document.getElementById('p-image-file').files[0];
-  const out = document.getElementById('p-status');
-  if (!file) { out.textContent = 'Choose an image first.'; return; }
-  try {
-    const fd = new FormData(); fd.append('file', file);
-    const r = await fetch(`${API}/media`, { method:'POST', headers: { 'Authorization': 'Bearer ' + TOKEN }, body: fd });
-    const text = await r.text(); let j; try { j = JSON.parse(text); } catch { j = { error: text }; }
-    if (r.ok) {
-      COVER_URL = j.url.startsWith('http') ? j.url : `${API}${j.url}`;
-      const img = document.getElementById('p-image-preview');
-      img.src = COVER_URL; img.classList.remove('hidden');
-      document.getElementById('p-image-url').value = COVER_URL;
-      out.textContent = 'Image uploaded to DB.';
-      refreshGallery();
-    } else { out.textContent = j.error || ('Upload failed: ' + text); }
-  } catch(e) { out.textContent = 'Network error: ' + e.message; }
-};
-document.getElementById('p-image-url').oninput = (e) => {
-  COVER_URL = e.target.value.trim();
-  const img = document.getElementById('p-image-preview');
-  if (COVER_URL) { img.src = COVER_URL; img.classList.remove('hidden'); } else { img.classList.add('hidden'); }
-};
+  if (file) {
+    coverImageId = await uploadFile(file);
+  }
 
-// Save / New
-function clearForm(){
-  document.getElementById('p-id').value = '';
-  document.getElementById('p-type').value = 'blog';
-  document.getElementById('p-title').value = '';
-  document.getElementById('p-excerpt').value = '';
-  quill && (quill.root.innerHTML = '');
-  document.getElementById('p-published').checked = false;
-  document.getElementById('p-image-url').value = '';
-  document.getElementById('p-image-preview').classList.add('hidden');
-  COVER_URL = '';
-  document.getElementById('p-status').textContent = '';
-}
-document.getElementById('btn-new').onclick = clearForm;
-
-document.getElementById('p-save').onclick = async () => {
-  const status = document.getElementById('p-status');
-  const id = document.getElementById('p-id').value.trim();
-  const payload = {
-    type: document.getElementById('p-type').value,
-    title: document.getElementById('p-title').value.trim(),
-    excerpt: document.getElementById('p-excerpt').value.trim(),
-    content: quill ? quill.root.innerHTML : '',
-    published: document.getElementById('p-published').checked,
-    coverImage: COVER_URL
-  };
-  const url = id ? `${API}/posts/${id}` : `${API}/posts`;
-  const method = id ? 'PUT' : 'POST';
-  try {
-    const r = await fetch(url, { method, headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(payload) });
-    const j = await r.json();
-    if (r.ok) { status.textContent = 'Saved.'; if (!id) document.getElementById('p-id').value = j._id; await refreshTable(); }
-    else { status.textContent = j.error || 'Failed'; }
-  } catch(e) { status.textContent = 'Network error'; }
-};
-
-// Table
-async function refreshTable(){
-  const type = document.getElementById('f-type').value;
-  const q = document.getElementById('f-q').value.trim();
-  const tBody = document.getElementById('t-body');
-  const info = document.getElementById('t-info');
-
-  const params = new URLSearchParams({ page: 1, limit: 20 });
-  if (type) params.set('type', type);
-  if (q) params.set('q', q);
-
-  const r = await fetch(`${API}/posts/admin?${params}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const j = await r.json();
-  if (!r.ok) { tBody.innerHTML = '<tr><td colspan="5" class="py-3 text-gray-500">Failed to load.</td></tr>'; return; }
-
-  tBody.innerHTML = j.items.map(p => `
-    <tr class="border-t">
-      <td class="py-2 pr-4">
-        <div class="font-medium">${p.title}</div>
-        <div class="text-xs text-gray-500">${p.slug}</div>
-      </td>
-      <td class="py-2 pr-4">${p.type}</td>
-      <td class="py-2 pr-4">${p.published ? 'Published' : 'Draft'}</td>
-      <td class="py-2 pr-4">${new Date(p.updatedAt).toLocaleString()}</td>
-      <td class="py-2 pr-4">
-        <button data-id="${p._id}" class="btn-edit text-amber-600 mr-3">Edit</button>
-        <button data-id="${p._id}" class="btn-del text-red-600">Delete</button>
-      </td>
-    </tr>
-  `).join('');
-
-  info.textContent = `Total: ${j.total} • Page ${j.page}`;
-
-  document.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.onclick = () => loadForEdit(btn.getAttribute('data-id'));
+  const r = await fetch(API + '/api/posts', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ type, title, excerpt, content, coverImageId, published })
   });
-  document.querySelectorAll('.btn-del').forEach(btn => {
-    btn.onclick = () => delPost(btn.getAttribute('data-id'));
+  const data = await r.json();
+  if (!r.ok) { alert(data.error || 'Save failed'); return; }
+  alert('Saved!');
+  loadPosts();
+});
+
+document.getElementById('createUser').addEventListener('click', async () => {
+  const name = document.getElementById('u-name').value.trim();
+  const email = document.getElementById('u-email').value.trim();
+  const password = document.getElementById('u-password').value;
+  const r = await fetch(API + '/api/auth/users', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ name, email, password })
+  });
+  const data = await r.json();
+  if (!r.ok) { alert(data.error || 'Create failed'); return; }
+  alert('User created');
+});
+
+async function loadPosts() {
+  const r = await fetch(API + '/api/posts/all', { headers:{ 'Authorization': 'Bearer ' + token } });
+  const rows = await r.json();
+  const tbody = document.getElementById('postsTbody');
+  tbody.innerHTML = '';
+  rows.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.className = 'border-b';
+    const status = p.published ? 'Published' : 'Draft';
+    const created = new Date(p.createdAt).toLocaleString();
+    tr.innerHTML = `
+      <td class="py-2 pr-3">${p.title}</td>
+      <td class="py-2 pr-3">${p.type}</td>
+      <td class="py-2 pr-3">${status}</td>
+      <td class="py-2 pr-3">${created}</td>
+    `;
+    tbody.appendChild(tr);
   });
 }
+document.getElementById('refreshPosts').addEventListener('click', loadPosts);
 
-async function loadForEdit(id){
-  const r = await fetch(`${API}/posts/admin?page=1&limit=1&id=${id}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const j = await r.json();
-  const p = j.items?.[0];
-  if (!p) return;
-  document.getElementById('p-id').value = p._id;
-  document.getElementById('p-type').value = p.type;
-  document.getElementById('p-title').value = p.title;
-  document.getElementById('p-excerpt').value = p.excerpt || '';
-  document.getElementById('p-published').checked = !!p.published;
-  COVER_URL = p.coverImage || '';
-  document.getElementById('p-image-url').value = COVER_URL;
-  const img = document.getElementById('p-image-preview');
-  if (COVER_URL) { img.src = COVER_URL; img.classList.remove('hidden'); } else { img.classList.add('hidden'); }
-  initQuill(p.content || '');
-}
-
-async function delPost(id){
-  if (!confirm('Delete this post?')) return;
-  const r = await fetch(`${API}/posts/${id}`, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  if (r.ok) { await refreshTable(); }
-}
-
-// Gallery (GridFS)
-async function refreshGallery(){
-  const g = document.getElementById('gallery');
-  try{
-    const r = await fetch(`${API}/media`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-    const j = await r.json();
-    if (!r.ok) { g.innerHTML = '<div class="text-sm text-gray-500">Failed to load.</div>'; return; }
-    g.innerHTML = j.items.map(it => `
-      <figure class="border rounded-xl overflow-hidden">
-        <img src="${API}${it.url}" class="w-full h-32 object-cover" />
-        <figcaption class="p-2 text-xs truncate">${it.filename}</figcaption>
-      </figure>
-    `).join('');
-  } catch { g.innerHTML = '<div class="text-sm text-gray-500">Network error.</div>'; }
-}
-document.getElementById('g-refresh').onclick = refreshGallery;
-
-// Users
-function refreshUsersCard(role){
-  const card = document.getElementById('tab-users');
-  if (role !== 'admin') { card.classList.add('hidden'); return; }
-  card.classList.remove('hidden'); refreshUsers();
-}
-async function refreshUsers(){
-  const body = document.getElementById('u-body');
-  try{
-    const r = await fetch(`${API}/users`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-    const j = await r.json();
-    if (!r.ok){ body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Failed to load.</td></tr>'; return; }
-    body.innerHTML = j.items.map(u => `
-      <tr class="border-t">
-        <td class="py-2 pr-4">${u.email}</td>
-        <td class="py-2 pr-4">${u.name || ''}</td>
-        <td class="py-2 pr-4">${u.role}</td>
-        <td class="py-2 pr-4">
-          <button data-id="${u._id}" class="u-mkadmin text-amber-600 mr-3">Make Admin</button>
-          <button data-id="${u._id}" class="u-del text-red-600">Delete</button>
-        </td>
-      </tr>
-    `).join('');
-    document.querySelectorAll('.u-mkadmin').forEach(b => b.onclick = () => updateUser(b.dataset.id, { role: 'admin' }));
-    document.querySelectorAll('.u-del').forEach(b => b.onclick = () => deleteUser(b.dataset.id));
-  }catch{ body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Network error.</td></tr>'; }
-}
-document.getElementById('u-refresh').onclick = refreshUsers;
-document.getElementById('u-create').onclick = async () => {
-  const payload = {
-    email: document.getElementById('u-email').value.trim(),
-    name: document.getElementById('u-name').value.trim(),
-    role: document.getElementById('u-role').value,
-    password: document.getElementById('u-pass').value
-  };
-  const r = await fetch(`${API}/users`, { method:'POST', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(payload) });
-  if (r.ok) refreshUsers();
-};
-async function updateUser(id, body){
-  const r = await fetch(`${API}/users/${id}`, { method:'PUT', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
-  if (r.ok) refreshUsers();
-}
-async function deleteUser(id){
-  if (!confirm('Delete user?')) return;
-  const r = await fetch(`${API}/users/${id}`, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  if (r.ok) refreshUsers();
-}
+if (token) loadPosts();
 </script>
 </body>
 </html>
