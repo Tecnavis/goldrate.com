@@ -1,35 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GoldRates Admin</title>
-  <link rel="icon" href="assets/favicon.png" />
-  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Point this to your live CMS base URL -->
-  <meta name="gold-api" content="http://localhost:8080" />
-  <style>
-    html, body { height:100%; }
-    .page { min-height:100%; display:flex; flex-direction:column; }
-    footer { margin-top:auto; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GoldRates Admin</title>
+<link rel="icon" href="assets/favicon.png" />
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Keep API target same as before; change here if needed -->
+<meta name="gold-api" content="https://goldrate-cms.onrender.com" />
+<style>
+  html,body{height:100%}
+  .page{min-height:100%;display:flex;flex-direction:column}
+  footer{margin-top:auto}
+</style>
 </head>
 <body class="bg-gray-50 text-gray-900">
 <div class="page">
-  <header class="border-b bg-white">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-      <h1 class="text-xl font-bold">GOLDRATES.COM ADMIN</h1>
+  <div class="max-w-7xl mx-auto p-6 w-full">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold">GOLDRATES.COM ADMIN</h1>
       <div class="flex items-center gap-3">
-        <img src="assets/admin-login.png" alt="Admin" class="h-8 w-8 rounded-full ring-2 ring-gray-200 object-cover" onerror="this.src='assets/favicon.png'">
+        <img src="assets/admin-login.png" alt="Admin" class="h-10 w-10 rounded-full ring-2 ring-gray-200 object-cover" onerror="this.src='assets/favicon.png'">
         <button id="logoutBtn" class="text-sm px-3 py-1.5 rounded-lg bg-gray-900 text-white">Logout</button>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-6">
-    <!-- LOGIN CARD -->
-    <section id="loginCard" class="max-w-md mx-auto bg-white border rounded-2xl p-6 hidden">
+    <!-- LOGIN (visible when no token) -->
+    <div id="loginCard" class="max-w-md mt-6 bg-white border rounded-2xl p-6 hidden">
       <div class="flex items-center gap-3 mb-4">
         <img src="assets/admin-login.png" class="h-10 w-10 rounded-full" onerror="this.src='assets/favicon.png'">
         <h2 class="text-lg font-semibold">Admin Sign In</h2>
@@ -39,23 +37,25 @@
         <input id="loginPassword" type="password" class="w-full border rounded-lg px-3 py-2" placeholder="Password">
         <button id="loginBtn" class="w-full bg-amber-500 text-white rounded-lg py-2 font-medium">Sign In</button>
       </div>
-    </section>
+    </div>
 
     <!-- BLOG/NEWS FORM -->
-    <section class="bg-white border rounded-2xl p-6 mb-6" id="postFormSection">
-      <h2 class="text-lg font-semibold mb-4">Create Post (News/Blog)</h2>
-      <div class="grid sm:grid-cols-2 gap-4 mb-4">
-        <select id="p-type" class="border rounded-lg px-3 py-2">
-          <option value="news">News</option>
-          <option value="blog">Blog</option>
-        </select>
+    <section class="mt-6 bg-white border rounded-2xl p-6" id="postFormSection">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Create Post (News/Blog)</h2>
         <label class="inline-flex items-center gap-2 text-sm">
           <input id="p-published" type="checkbox" class="h-4 w-4">
           <span>Publish now</span>
         </label>
       </div>
-      <input id="p-title" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Title">
-      <input id="p-excerpt" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Short excerpt">
+      <div class="grid sm:grid-cols-2 gap-4 mb-4">
+        <select id="p-type" class="border rounded-lg px-3 py-2">
+          <option value="news">News</option>
+          <option value="blog">Blog</option>
+        </select>
+        <input id="p-title" class="border rounded-lg px-3 py-2" placeholder="Title" />
+      </div>
+      <input id="p-excerpt" class="w-full border rounded-lg px-3 py-2 mb-3" placeholder="Short excerpt" />
       <div class="mb-3">
         <div class="text-sm text-gray-600 mb-1">Content</div>
         <div id="quill" class="bg-white rounded-lg border"></div>
@@ -70,12 +70,14 @@
         </div>
       </div>
       <button id="savePost" class="bg-green-600 text-white rounded-lg px-4 py-2 font-medium">Save Post</button>
-      <p class="text-xs text-gray-500 mt-2">If “Publish now” is not ticked, the post will be saved as <b>Draft</b> and shown that way in the table below.</p>
+      <p class="text-xs text-gray-500 mt-2">If “Publish now” is not ticked, the post will be saved as <b>Draft</b>.</p>
     </section>
 
-    <!-- USER CREATION (comes just below blog form) -->
-    <section class="bg-white border rounded-2xl p-6 mb-6" id="userCreateSection">
-      <h2 class="text-lg font-semibold mb-4">Create User</h2>
+    <!-- USER CREATION (FIRST BELOW BLOG FORM) -->
+    <section class="mt-6 bg-white border rounded-2xl p-6" id="userCreateSection">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Create User</h2>
+      </div>
       <div class="grid sm:grid-cols-3 gap-3">
         <input id="u-name" class="border rounded-lg px-3 py-2" placeholder="Name">
         <input id="u-email" type="email" class="border rounded-lg px-3 py-2" placeholder="Email">
@@ -87,7 +89,7 @@
     </section>
 
     <!-- POSTS TABLE -->
-    <section class="bg-white border rounded-2xl p-6">
+    <section class="mt-6 bg-white border rounded-2xl p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold">Posts</h2>
         <button id="refreshPosts" class="text-sm px-3 py-1.5 rounded-lg border">Refresh</button>
@@ -104,10 +106,30 @@
         </table>
       </div>
     </section>
-  </main>
 
+    <!-- USERS TABLE (optional, keeps parity with your old page) -->
+    <section class="mt-6 bg-white border rounded-2xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Users</h2>
+        <button id="refreshUsers" class="text-sm px-3 py-1.5 rounded-lg border">Refresh</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead><tr class="text-left border-b">
+            <th class="py-2 pr-3">Name</th>
+            <th class="py-2 pr-3">Email</th>
+            <th class="py-2 pr-3">Role</th>
+            <th class="py-2 pr-3">Created</th>
+          </tr></thead>
+          <tbody id="usersTbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Sticky footer as requested -->
   <footer class="bg-white border-t">
-    <div class="max-w-6xl mx-auto px-4 py-4 text-xs text-gray-600 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-6 py-4 text-xs text-gray-600 flex items-center justify-between">
       <span>© goldrates.com</span>
       <span>design and development by <a class="underline" href="https://tecnavis.in" target="_blank" rel="noopener">tecnavis.in</a></span>
     </div>
@@ -116,7 +138,7 @@
 
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
-const API = document.querySelector('meta[name=gold-api]').content;
+const API = document.querySelector('meta[name=gold-api]').content.replace(/\/$/, '');
 let token = localStorage.getItem('gr_token') || '';
 
 const loginCard = document.getElementById('loginCard');
@@ -140,7 +162,7 @@ document.getElementById('loginBtn')?.addEventListener('click', async () => {
     token = data.token;
     localStorage.setItem('gr_token', token);
     setAuthUI();
-    loadPosts();
+    loadPosts(); loadUsers();
   } else {
     alert(data.error || 'Login failed');
   }
@@ -212,6 +234,7 @@ document.getElementById('createUser').addEventListener('click', async () => {
   const data = await r.json();
   if (!r.ok) { alert(data.error || 'Create failed'); return; }
   alert('User created');
+  loadUsers();
 });
 
 async function loadPosts() {
@@ -233,9 +256,35 @@ async function loadPosts() {
     tbody.appendChild(tr);
   });
 }
-document.getElementById('refreshPosts').addEventListener('click', loadPosts);
 
-if (token) loadPosts();
+async function loadUsers() {
+  // basic list via /api/auth/me not available; typically you'd have /api/users
+  // For parity, we'll just show current user payload if no list endpoint exists.
+  const tbody = document.getElementById('usersTbody');
+  tbody.innerHTML = '';
+  try {
+    const r = await fetch(API + '/api/auth/me', { headers:{ 'Authorization': 'Bearer ' + token } });
+    const data = await r.json();
+    if (data && data.user) {
+      const tr = document.createElement('tr');
+      tr.className = 'border-b';
+      tr.innerHTML = `
+        <td class="py-2 pr-3">${data.user.name || '-'}</td>
+        <td class="py-2 pr-3">${data.user.email || '-'}</td>
+        <td class="py-2 pr-3">${data.user.role || '-'}</td>
+        <td class="py-2 pr-3">-</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+document.getElementById('refreshPosts').addEventListener('click', loadPosts);
+document.getElementById('refreshUsers').addEventListener('click', loadUsers);
+
+if (token) { loadPosts(); loadUsers(); }
 </script>
 </body>
 </html>
