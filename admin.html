@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <!-- LOGIN: left image / right form -->
+  <!-- LOGIN -->
   <div id="card-login" class="mt-6 grid md:grid-cols-2 gap-6 items-stretch">
     <div class="hidden md:block relative rounded-2xl overflow-hidden border bg-white">
       <img src="https://images.unsplash.com/photo-1603566234499-1a5b9d5f7f86?q=80&w=1400&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover" alt="Gold market" />
@@ -37,7 +37,6 @@
         <button id="a-login" class="bg-amber-500 text-white px-4 py-2 rounded-lg">Login</button>
       </div>
       <div id="a-status" class="text-xs text-gray-500 mt-3"></div>
-      <div class="text-[11px] text-gray-400 mt-2">Tip: first boot admin is created from server env ADMIN_EMAIL / ADMIN_PASSWORD if DB is empty.</div>
     </div>
   </div>
 
@@ -76,13 +75,13 @@
         </div>
         <div class="grid sm:grid-cols-2 gap-3">
           <div>
-            <label class="text-sm text-gray-600">Cover Image (Upload)</label>
+            <label class="text-sm text-gray-600">Cover Image (Upload to DB)</label>
             <input id="p-image-file" type="file" accept="image/*" class="mt-1 w-full text-sm" />
             <button id="p-upload" type="button" class="mt-2 bg-amber-500 text-white px-3 py-2 rounded-lg">Upload Image</button>
           </div>
           <div>
             <label class="text-sm text-gray-600">Or Image URL</label>
-            <input id="p-image-url" class="mt-1 w-full border rounded-lg px-3 py-2 text-sm" placeholder="https://..."/>
+            <input id="p-image-url" class="mt-1 w-full border rounded-lg px-3 py-2 text-sm" placeholder="https://..." />
           </div>
         </div>
         <img id="p-image-preview" class="hidden mt-3 w-full h-48 object-cover rounded-xl" alt="Preview" />
@@ -113,7 +112,7 @@
             <tr class="text-left text-gray-500">
               <th class="py-2 pr-4">Title</th>
               <th class="py-2 pr-4">Type</th>
-              <th class="py-2 pr-4">Published</th>
+              <th class="py-2 pr-4">Status</th>
               <th class="py-2 pr-4">Updated</th>
               <th class="py-2 pr-4">Actions</th>
             </tr>
@@ -129,13 +128,13 @@
     <!-- GALLERY -->
     <section id="tab-gallery" class="tab-pane hidden mt-4 card p-5 rounded-2xl border bg-white">
       <div class="flex items-center justify-between">
-        <div class="text-sm text-gray-500">Uploads Gallery</div>
+        <div class="text-sm text-gray-500">Media (GridFS)</div>
         <button id="g-refresh" class="px-3 py-2 rounded-lg border text-sm">Refresh</button>
       </div>
       <div id="gallery" class="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 mt-3"></div>
     </section>
 
-    <!-- USERS (Admin only) -->
+    <!-- USERS -->
     <section id="tab-users" class="tab-pane hidden mt-4 card p-5 rounded-2xl border bg-white">
       <div class="flex items-center justify-between mb-3">
         <div class="text-sm text-gray-500">Users</div>
@@ -186,93 +185,74 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// UI helpers
-function showApp() {
+function showApp(){
   document.getElementById('card-login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('btn-logout').classList.remove('hidden');
-  // default to CMS tab
   document.querySelector('[data-tab="tab-cms"]').click();
 }
-function showLogin() {
+function showLogin(){
   document.getElementById('card-login').classList.remove('hidden');
   document.getElementById('app').classList.add('hidden');
   document.getElementById('btn-logout').classList.add('hidden');
 }
 
-// Logout
 document.getElementById('btn-logout').onclick = () => {
-  localStorage.removeItem('goldrates_token');
-  TOKEN = '';
-  location.reload();
+  localStorage.removeItem('goldrates_token'); TOKEN=''; location.reload();
 };
 
-// Quill init
-function initQuill(html='') {
-  if (quill) { quill.root.innerHTML = html; return; }
+function initQuill(html=''){
+  if (quill){ quill.root.innerHTML = html; return; }
   quill = new Quill('#quill', { theme: 'snow' });
   quill.root.innerHTML = html;
 }
 
-// Try resume
-async function tryResume() {
+async function tryResume(){
   const who = document.getElementById('whoami');
   if (!TOKEN) return showLogin();
-  try {
+  try{
     const r = await fetch(`${API}/auth/me`, { headers: { Authorization: 'Bearer ' + TOKEN } });
-    if (!r.ok) { showLogin(); return; }
+    if (!r.ok) return showLogin();
     const j = await r.json();
     who.textContent = (j.user?.email || '') + (j.user?.role ? ' ('+j.user.role+')' : '');
     showApp();
     initQuill('');
     refreshTable(); refreshGallery(); refreshUsersCard(j.user?.role);
-  } catch { showLogin(); }
+  }catch{ showLogin(); }
 }
 tryResume();
 
-// Login
-async function login() {
+async function login(){
   const email = document.getElementById('a-email').value.trim();
   const password = document.getElementById('a-pass').value;
   const out = document.getElementById('a-status');
   out.textContent = 'Logging in...';
-  try {
+  try{
     const r = await fetch(`${API}/auth/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email, password })});
     const j = await r.json();
-    if (r.ok) {
-      TOKEN = j.token;
-      localStorage.setItem('goldrates_token', TOKEN);
-      out.textContent = 'Logged in.';
-      location.reload();
-    } else {
-      out.textContent = j.error || 'Login failed';
-    }
-  } catch (e) {
-    out.textContent = 'Network error';
-  }
+    if (r.ok){ TOKEN = j.token; localStorage.setItem('goldrates_token', TOKEN); location.reload(); }
+    else out.textContent = j.error || 'Login failed';
+  }catch(e){ out.textContent = 'Network error'; }
 }
 document.getElementById('a-login').onclick = login;
 
-// Upload & preview (with better error message)
+// Upload to GridFS
 document.getElementById('p-upload').onclick = async () => {
   const file = document.getElementById('p-image-file').files[0];
   const out = document.getElementById('p-status');
   if (!file) { out.textContent = 'Choose an image first.'; return; }
   try {
     const fd = new FormData(); fd.append('file', file);
-    const r = await fetch(`${API}/uploads`, { method:'POST', headers: { 'Authorization': 'Bearer ' + TOKEN }, body: fd });
-    const text = await r.text();
-    let j; try { j = JSON.parse(text); } catch { j = { error: text }; }
+    const r = await fetch(`${API}/media`, { method:'POST', headers: { 'Authorization': 'Bearer ' + TOKEN }, body: fd });
+    const text = await r.text(); let j; try { j = JSON.parse(text); } catch { j = { error: text }; }
     if (r.ok) {
-      COVER_URL = j.url?.startsWith('http') ? j.url : `${API}${j.url}`;
+      COVER_URL = j.url.startsWith('http') ? j.url : `${API}${j.url}`;
       const img = document.getElementById('p-image-preview');
       img.src = COVER_URL; img.classList.remove('hidden');
       document.getElementById('p-image-url').value = COVER_URL;
-      out.textContent = 'Image uploaded.';
+      out.textContent = 'Image uploaded to DB.';
       refreshGallery();
-    } else {
-      out.textContent = j.error || ('Upload failed: ' + text);
-    }
+    } else { out.textContent = j.error || ('Upload failed: ' + text); }
   } catch(e) { out.textContent = 'Network error: ' + e.message; }
 };
 document.getElementById('p-image-url').oninput = (e) => {
@@ -282,7 +262,7 @@ document.getElementById('p-image-url').oninput = (e) => {
 };
 
 // Save / New
-function clearForm() {
+function clearForm(){
   document.getElementById('p-id').value = '';
   document.getElementById('p-type').value = 'blog';
   document.getElementById('p-title').value = '';
@@ -310,22 +290,15 @@ document.getElementById('p-save').onclick = async () => {
   const url = id ? `${API}/posts/${id}` : `${API}/posts`;
   const method = id ? 'PUT' : 'POST';
   try {
-    const r = await fetch(url, {
-      method,
-      headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN },
-      body: JSON.stringify(payload)
-    });
+    const r = await fetch(url, { method, headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(payload) });
     const j = await r.json();
-    if (r.ok) {
-      status.textContent = 'Saved.';
-      if (!id) document.getElementById('p-id').value = j._id;
-      await refreshTable();
-    } else { status.textContent = j.error || 'Failed'; }
+    if (r.ok) { status.textContent = 'Saved.'; if (!id) document.getElementById('p-id').value = j._id; await refreshTable(); }
+    else { status.textContent = j.error || 'Failed'; }
   } catch(e) { status.textContent = 'Network error'; }
 };
 
 // Table
-async function refreshTable() {
+async function refreshTable(){
   const type = document.getElementById('f-type').value;
   const q = document.getElementById('f-q').value.trim();
   const tBody = document.getElementById('t-body');
@@ -346,7 +319,7 @@ async function refreshTable() {
         <div class="text-xs text-gray-500">${p.slug}</div>
       </td>
       <td class="py-2 pr-4">${p.type}</td>
-      <td class="py-2 pr-4">${p.published ? 'Yes' : 'No'}</td>
+      <td class="py-2 pr-4">${p.published ? 'Published' : 'Draft'}</td>
       <td class="py-2 pr-4">${new Date(p.updatedAt).toLocaleString()}</td>
       <td class="py-2 pr-4">
         <button data-id="${p._id}" class="btn-edit text-amber-600 mr-3">Edit</button>
@@ -365,7 +338,7 @@ async function refreshTable() {
   });
 }
 
-async function loadForEdit(id) {
+async function loadForEdit(id){
   const r = await fetch(`${API}/posts/admin?page=1&limit=1&id=${id}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
   const j = await r.json();
   const p = j.items?.[0];
@@ -382,43 +355,41 @@ async function loadForEdit(id) {
   initQuill(p.content || '');
 }
 
-async function delPost(id) {
+async function delPost(id){
   if (!confirm('Delete this post?')) return;
   const r = await fetch(`${API}/posts/${id}`, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
   if (r.ok) { await refreshTable(); }
 }
 
-// Gallery
-async function refreshGallery() {
+// Gallery (GridFS)
+async function refreshGallery(){
   const g = document.getElementById('gallery');
-  try {
-    const r = await fetch(`${API}/uploads`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  try{
+    const r = await fetch(`${API}/media`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
     const j = await r.json();
     if (!r.ok) { g.innerHTML = '<div class="text-sm text-gray-500">Failed to load.</div>'; return; }
     g.innerHTML = j.items.map(it => `
       <figure class="border rounded-xl overflow-hidden">
         <img src="${API}${it.url}" class="w-full h-32 object-cover" />
-        <figcaption class="p-2 text-xs truncate">${it.file}</figcaption>
+        <figcaption class="p-2 text-xs truncate">${it.filename}</figcaption>
       </figure>
     `).join('');
   } catch { g.innerHTML = '<div class="text-sm text-gray-500">Network error.</div>'; }
 }
 document.getElementById('g-refresh').onclick = refreshGallery;
 
-// Users (admin only)
-function refreshUsersCard(role) {
+// Users
+function refreshUsersCard(role){
   const card = document.getElementById('tab-users');
   if (role !== 'admin') { card.classList.add('hidden'); return; }
-  card.classList.remove('hidden');
-  refreshUsers();
+  card.classList.remove('hidden'); refreshUsers();
 }
-
-async function refreshUsers() {
+async function refreshUsers(){
   const body = document.getElementById('u-body');
-  try {
+  try{
     const r = await fetch(`${API}/users`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
     const j = await r.json();
-    if (!r.ok) { body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Failed to load.</td></tr>'; return; }
+    if (!r.ok){ body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Failed to load.</td></tr>'; return; }
     body.innerHTML = j.items.map(u => `
       <tr class="border-t">
         <td class="py-2 pr-4">${u.email}</td>
@@ -432,7 +403,7 @@ async function refreshUsers() {
     `).join('');
     document.querySelectorAll('.u-mkadmin').forEach(b => b.onclick = () => updateUser(b.dataset.id, { role: 'admin' }));
     document.querySelectorAll('.u-del').forEach(b => b.onclick = () => deleteUser(b.dataset.id));
-  } catch { body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Network error.</td></tr>'; }
+  }catch{ body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Network error.</td></tr>'; }
 }
 document.getElementById('u-refresh').onclick = refreshUsers;
 document.getElementById('u-create').onclick = async () => {
@@ -443,14 +414,13 @@ document.getElementById('u-create').onclick = async () => {
     password: document.getElementById('u-pass').value
   };
   const r = await fetch(`${API}/users`, { method:'POST', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(payload) });
-  if (r.ok) { refreshUsers(); }
+  if (r.ok) refreshUsers();
 };
-
-async function updateUser(id, body) {
+async function updateUser(id, body){
   const r = await fetch(`${API}/users/${id}`, { method:'PUT', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
   if (r.ok) refreshUsers();
 }
-async function deleteUser(id) {
+async function deleteUser(id){
   if (!confirm('Delete user?')) return;
   const r = await fetch(`${API}/users/${id}`, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
   if (r.ok) refreshUsers();
