@@ -1,0 +1,1 @@
+# goldrate.com
