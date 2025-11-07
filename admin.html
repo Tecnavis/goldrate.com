@@ -183,14 +183,14 @@
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
 /**
- * Admin UI
- * - Reads API base from meta tag (fallback to location.origin)
- * - Handles token in localStorage: 'goldrates_token'
- * - Uploads to /media (server should mount uploads router + static at /media)
+ * Admin UI (fixed)
+ * - API from meta tag -> location.origin -> fallback
+ * - Auto-upload + robust handlers + clear logging/status text
  */
 
 const metaApi = document.querySelector('meta[name="gold-api"]')?.content;
 const API = metaApi && metaApi.trim() ? metaApi.trim() : (location.origin || 'https://goldrate-cms.onrender.com');
+console.log('Admin using API:', API);
 
 let TOKEN = localStorage.getItem('goldrates_token') || '';
 let COVER_URL = '';
@@ -272,6 +272,14 @@ async function login(){
 }
 document.getElementById('a-login').onclick = login;
 
+// Auto-upload when file chosen (better UX)
+document.getElementById('p-image-file').addEventListener('change', () => {
+  if (document.getElementById('p-image-file').files.length) {
+    // trigger upload automatically
+    document.getElementById('p-upload').click();
+  }
+});
+
 // Upload to GridFS (/media endpoint)
 document.getElementById('p-upload').onclick = async () => {
   const fileInput = document.getElementById('p-image-file');
@@ -284,23 +292,28 @@ document.getElementById('p-upload').onclick = async () => {
     return;
   }
 
+  out.textContent = 'Uploading...';
+  console.log('Uploading file:', file.name, file.type, file.size);
+
   try {
-    out.textContent = 'Uploading...';
     const fd = new FormData();
     fd.append('file', file);
 
     const r = await fetch(`${API}/media`, {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + TOKEN },
+      headers: { 'Authorization': 'Bearer ' + TOKEN }, // DO NOT set Content-Type when sending FormData
       body: fd
     });
 
-    const text = await r.text();
-    let j;
-    try { j = JSON.parse(text); } catch { j = { error: text }; }
+    const respText = await r.text();
+    let respJson;
+    try { respJson = JSON.parse(respText); } catch { respJson = null; }
+
+    console.log('Upload response status:', r.status, respText);
 
     if (r.ok) {
-      COVER_URL = j.url && j.url.startsWith('http') ? j.url : `${API}${j.url || ''}`;
+      const url = respJson?.url || respText || '';
+      COVER_URL = url && url.startsWith('http') ? url : `${API}${url}`;
       const img = document.getElementById('p-image-preview');
       img.src = COVER_URL;
       img.classList.remove('hidden');
@@ -308,12 +321,13 @@ document.getElementById('p-upload').onclick = async () => {
       out.textContent = 'Image uploaded successfully.';
       refreshGallery();
     } else {
-      console.warn('Upload failed', r.status, j);
-      out.textContent = j.error || ('Upload failed: ' + (text || r.status));
+      const errMsg = respJson?.error || respText || `HTTP ${r.status}`;
+      out.textContent = `Upload failed: ${errMsg}`;
+      console.warn('Upload failed details:', r.status, respText);
     }
-  } catch (e) {
-    console.error('Image upload failed:', e);
-    out.textContent = 'Network error: ' + (e.message || e);
+  } catch (err) {
+    console.error('Image upload exception:', err);
+    out.textContent = 'Network error: ' + (err.message || err);
   }
 };
 document.getElementById('p-image-url').oninput = (e) => {
@@ -350,12 +364,33 @@ document.getElementById('p-save').onclick = async () => {
   };
   const url = id ? `${API}/posts/${id}` : `${API}/posts`;
   const method = id ? 'PUT' : 'POST';
+  status.textContent = 'Saving...';
   try {
-    const r = await fetch(url, { method, headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(payload) });
-    const j = await r.json();
-    if (r.ok) { status.textContent = 'Saved.'; if (!id) document.getElementById('p-id').value = j._id; await refreshTable(); }
-    else { console.warn('Save failed', j); status.textContent = j.error || 'Failed'; }
-  } catch(e) { console.error('Save post error', e); status.textContent = 'Network error'; }
+    const r = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+      body: JSON.stringify(payload)
+    });
+
+    const respText = await r.text();
+    let respJson;
+    try { respJson = JSON.parse(respText); } catch { respJson = null; }
+
+    console.log('Save response status:', r.status, respText);
+
+    if (r.ok) {
+      status.textContent = 'Saved.';
+      if (!id && respJson && respJson._id) document.getElementById('p-id').value = respJson._id;
+      await refreshTable();
+    } else {
+      const errMsg = respJson?.error || respText || `HTTP ${r.status}`;
+      status.textContent = 'Save failed: ' + errMsg;
+      console.warn('Save failed details:', r.status, respText);
+    }
+  } catch (err) {
+    console.error('Save exception:', err);
+    status.textContent = 'Network error: ' + (err.message || err);
+  }
 };
 
 // Table
@@ -485,7 +520,7 @@ async function refreshUsers(){
         <td class="py-2 pr-4">${u.role}</td>
         <td class="py-2 pr-4">
           <button data-id="${u._id}" class="u-mkadmin text-amber-600 mr-3">Make Admin</button>
-          <button data-id="${u._id}" class="u-del text-red-600">Delete</button>
+          <button data-id="${u._1d}" class="u-del text-red-600">Delete</button>
         </td>
       </tr>
     `).join('');
