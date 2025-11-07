@@ -7,6 +7,7 @@
 <link rel="icon" href="assets/favicon.png" />
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Set this meta to your API base. For local testing use http://localhost:4000 -->
 <meta name="gold-api" content="https://goldrate-cms.onrender.com" />
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -22,16 +23,16 @@
   <!-- LOGIN -->
   <div id="card-login" class="mt-6 grid md:grid-cols-2 gap-6 items-stretch">
     <div class="hidden md:block relative rounded-2xl overflow-hidden border bg-white h-58">
-  <img src="./assets/123.jpeg" class="absolute inset-0 w-full h-full object-cover" alt="Gold market" />
-  <div class="absolute inset-0 bg-gradient-to-tr from-black/40 to-black/10"></div>
+      <img src="./assets/123.jpeg" class="absolute inset-0 w-full h-full object-cover" alt="Gold market" />
+      <div class="absolute inset-0 bg-gradient-to-tr from-black/40 to-black/10"></div>
 
-  <div class="absolute inset-0 flex items-end p-6 text-white">
-    <div>
-      <div class="text-lg font-semibold">Welcome back</div>
-      <div class="text-sm text-white/80">Manage posts, media and users securely.</div>
+      <div class="absolute inset-0 flex items-end p-6 text-white">
+        <div>
+          <div class="text-lg font-semibold">Welcome back</div>
+          <div class="text-sm text-white/80">Manage posts, media and users securely.</div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
     <div class="card p-6 rounded-2xl border bg-white shadow-sm">
       <div class="text-sm text-gray-500 mb-2">Login</div>
@@ -51,7 +52,8 @@
       <button data-tab="tab-cms" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">CMS Editor</button>
       <button data-tab="tab-posts" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">Posts Table</button>
       <button data-tab="tab-gallery" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">Gallery</button>
-      <button data-tab="tab-users" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">Users</button>
+      <!-- Users tab hidden by default; JS will show for admin -->
+      <button data-tab="tab-users" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm hidden">Users</button>
     </div>
 
     <!-- CMS EDITOR -->
@@ -170,6 +172,7 @@
     </section>
   </div>
 </div>
+
 <footer class="fixed bottom-0 left-0 w-full border-t border-gray-200 bg-white py-3 text-center text-xs text-gray-600 shadow">
   © 2025 GoldRates.com — Design & Development by 
   <a href="https://tecnavis.in" target="_blank" class="text-amber-600 hover:underline">
@@ -179,12 +182,21 @@
 
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
-const API = 'https://goldrate-cms.onrender.com';
+/**
+ * Admin UI
+ * - Reads API base from meta tag (fallback to location.origin)
+ * - Handles token in localStorage: 'goldrates_token'
+ * - Uploads to /media (server should mount uploads router + static at /media)
+ */
+
+const metaApi = document.querySelector('meta[name="gold-api"]')?.content;
+const API = metaApi && metaApi.trim() ? metaApi.trim() : (location.origin || 'https://goldrate-cms.onrender.com');
+
 let TOKEN = localStorage.getItem('goldrates_token') || '';
 let COVER_URL = '';
 let quill;
 
-// Tabs
+// Tabs behavior
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const target = btn.getAttribute('data-tab');
@@ -199,7 +211,9 @@ function showApp(){
   document.getElementById('card-login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('btn-logout').classList.remove('hidden');
-  document.querySelector('[data-tab="tab-cms"]').click();
+  // Show CMS by default
+  const cmsBtn = document.querySelector('[data-tab="tab-cms"]');
+  cmsBtn && cmsBtn.click();
 }
 function showLogin(){
   document.getElementById('card-login').classList.remove('hidden');
@@ -222,13 +236,22 @@ async function tryResume(){
   if (!TOKEN) return showLogin();
   try{
     const r = await fetch(`${API}/auth/me`, { headers: { Authorization: 'Bearer ' + TOKEN } });
-    if (!r.ok) return showLogin();
+    if (!r.ok) {
+      console.warn('Authorization check failed', r.status);
+      return showLogin();
+    }
     const j = await r.json();
     who.textContent = (j.user?.email || '') + (j.user?.role ? ' ('+j.user.role+')' : '');
     showApp();
     initQuill('');
-    refreshTable(); refreshGallery(); refreshUsersCard(j.user?.role);
-  }catch{ showLogin(); }
+    // load table/gallery and enable users tab if admin — note: users pane stays hidden until clicked
+    await refreshTable();
+    await refreshGallery();
+    refreshUsersCard(j.user?.role);
+  }catch(e){
+    console.error('tryResume error', e);
+    showLogin();
+  }
 }
 tryResume();
 
@@ -242,28 +265,56 @@ async function login(){
     const j = await r.json();
     if (r.ok){ TOKEN = j.token; localStorage.setItem('goldrates_token', TOKEN); location.reload(); }
     else out.textContent = j.error || 'Login failed';
-  }catch(e){ out.textContent = 'Network error'; }
+  }catch(e){
+    console.error('Login error', e);
+    out.textContent = 'Network error: ' + (e.message || e);
+  }
 }
 document.getElementById('a-login').onclick = login;
 
-// Upload to GridFS
+// Upload to GridFS (/media endpoint)
 document.getElementById('p-upload').onclick = async () => {
-  const file = document.getElementById('p-image-file').files[0];
+  const fileInput = document.getElementById('p-image-file');
+  const file = fileInput.files[0];
   const out = document.getElementById('p-status');
-  if (!file) { out.textContent = 'Choose an image first.'; return; }
+
+  if (!file) {
+    fileInput.click();
+    out.textContent = 'Please choose an image...';
+    return;
+  }
+
   try {
-    const fd = new FormData(); fd.append('file', file);
-    const r = await fetch(`${API}/media`, { method:'POST', headers: { 'Authorization': 'Bearer ' + TOKEN }, body: fd });
-    const text = await r.text(); let j; try { j = JSON.parse(text); } catch { j = { error: text }; }
+    out.textContent = 'Uploading...';
+    const fd = new FormData();
+    fd.append('file', file);
+
+    const r = await fetch(`${API}/media`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + TOKEN },
+      body: fd
+    });
+
+    const text = await r.text();
+    let j;
+    try { j = JSON.parse(text); } catch { j = { error: text }; }
+
     if (r.ok) {
-      COVER_URL = j.url.startsWith('http') ? j.url : `${API}${j.url}`;
+      COVER_URL = j.url && j.url.startsWith('http') ? j.url : `${API}${j.url || ''}`;
       const img = document.getElementById('p-image-preview');
-      img.src = COVER_URL; img.classList.remove('hidden');
+      img.src = COVER_URL;
+      img.classList.remove('hidden');
       document.getElementById('p-image-url').value = COVER_URL;
-      out.textContent = 'Image uploaded to DB.';
+      out.textContent = 'Image uploaded successfully.';
       refreshGallery();
-    } else { out.textContent = j.error || ('Upload failed: ' + text); }
-  } catch(e) { out.textContent = 'Network error: ' + e.message; }
+    } else {
+      console.warn('Upload failed', r.status, j);
+      out.textContent = j.error || ('Upload failed: ' + (text || r.status));
+    }
+  } catch (e) {
+    console.error('Image upload failed:', e);
+    out.textContent = 'Network error: ' + (e.message || e);
+  }
 };
 document.getElementById('p-image-url').oninput = (e) => {
   COVER_URL = e.target.value.trim();
@@ -303,8 +354,8 @@ document.getElementById('p-save').onclick = async () => {
     const r = await fetch(url, { method, headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(payload) });
     const j = await r.json();
     if (r.ok) { status.textContent = 'Saved.'; if (!id) document.getElementById('p-id').value = j._id; await refreshTable(); }
-    else { status.textContent = j.error || 'Failed'; }
-  } catch(e) { status.textContent = 'Network error'; }
+    else { console.warn('Save failed', j); status.textContent = j.error || 'Failed'; }
+  } catch(e) { console.error('Save post error', e); status.textContent = 'Network error'; }
 };
 
 // Table
@@ -318,57 +369,68 @@ async function refreshTable(){
   if (type) params.set('type', type);
   if (q) params.set('q', q);
 
-  const r = await fetch(`${API}/posts/admin?${params}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const j = await r.json();
-  if (!r.ok) { tBody.innerHTML = '<tr><td colspan="5" class="py-3 text-gray-500">Failed to load.</td></tr>'; return; }
+  try {
+    const r = await fetch(`${API}/posts/admin?${params}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    const j = await r.json();
+    if (!r.ok) { tBody.innerHTML = '<tr><td colspan="5" class="py-3 text-gray-500">Failed to load.</td></tr>'; return; }
 
-  tBody.innerHTML = j.items.map(p => `
-    <tr class="border-t">
-      <td class="py-2 pr-4">
-        <div class="font-medium">${p.title}</div>
-        <div class="text-xs text-gray-500">${p.slug}</div>
-      </td>
-      <td class="py-2 pr-4">${p.type}</td>
-      <td class="py-2 pr-4">${p.published ? 'Published' : 'Draft'}</td>
-      <td class="py-2 pr-4">${new Date(p.updatedAt).toLocaleString()}</td>
-      <td class="py-2 pr-4">
-        <button data-id="${p._id}" class="btn-edit text-amber-600 mr-3">Edit</button>
-        <button data-id="${p._id}" class="btn-del text-red-600">Delete</button>
-      </td>
-    </tr>
-  `).join('');
+    tBody.innerHTML = j.items.map(p => `
+      <tr class="border-t">
+        <td class="py-2 pr-4">
+          <div class="font-medium">${p.title}</div>
+          <div class="text-xs text-gray-500">${p.slug}</div>
+        </td>
+        <td class="py-2 pr-4">${p.type}</td>
+        <td class="py-2 pr-4">${p.published ? 'Published' : 'Draft'}</td>
+        <td class="py-2 pr-4">${new Date(p.updatedAt).toLocaleString()}</td>
+        <td class="py-2 pr-4">
+          <button data-id="${p._id}" class="btn-edit text-amber-600 mr-3">Edit</button>
+          <button data-id="${p._id}" class="btn-del text-red-600">Delete</button>
+        </td>
+      </tr>
+    `).join('');
 
-  info.textContent = `Total: ${j.total} • Page ${j.page}`;
+    info.textContent = `Total: ${j.total} • Page ${j.page}`;
 
-  document.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.onclick = () => loadForEdit(btn.getAttribute('data-id'));
-  });
-  document.querySelectorAll('.btn-del').forEach(btn => {
-    btn.onclick = () => delPost(btn.getAttribute('data-id'));
-  });
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.onclick = () => loadForEdit(btn.getAttribute('data-id'));
+    });
+    document.querySelectorAll('.btn-del').forEach(btn => {
+      btn.onclick = () => delPost(btn.getAttribute('data-id'));
+    });
+  } catch (e) {
+    console.error('refreshTable error', e);
+    tBody.innerHTML = '<tr><td colspan="5" class="py-3 text-gray-500">Network error.</td></tr>';
+  }
 }
 
 async function loadForEdit(id){
-  const r = await fetch(`${API}/posts/admin?page=1&limit=1&id=${id}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const j = await r.json();
-  const p = j.items?.[0];
-  if (!p) return;
-  document.getElementById('p-id').value = p._id;
-  document.getElementById('p-type').value = p.type;
-  document.getElementById('p-title').value = p.title;
-  document.getElementById('p-excerpt').value = p.excerpt || '';
-  document.getElementById('p-published').checked = !!p.published;
-  COVER_URL = p.coverImage || '';
-  document.getElementById('p-image-url').value = COVER_URL;
-  const img = document.getElementById('p-image-preview');
-  if (COVER_URL) { img.src = COVER_URL; img.classList.remove('hidden'); } else { img.classList.add('hidden'); }
-  initQuill(p.content || '');
+  try {
+    const r = await fetch(`${API}/posts/admin?page=1&limit=1&id=${id}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    const j = await r.json();
+    const p = j.items?.[0];
+    if (!p) return;
+    document.getElementById('p-id').value = p._id;
+    document.getElementById('p-type').value = p.type;
+    document.getElementById('p-title').value = p.title;
+    document.getElementById('p-excerpt').value = p.excerpt || '';
+    document.getElementById('p-published').checked = !!p.published;
+    COVER_URL = p.coverImage || '';
+    document.getElementById('p-image-url').value = COVER_URL;
+    const img = document.getElementById('p-image-preview');
+    if (COVER_URL) { img.src = COVER_URL; img.classList.remove('hidden'); } else { img.classList.add('hidden'); }
+    initQuill(p.content || '');
+  } catch (e) {
+    console.error('loadForEdit error', e);
+  }
 }
 
 async function delPost(id){
   if (!confirm('Delete this post?')) return;
-  const r = await fetch(`${API}/posts/${id}`, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  if (r.ok) { await refreshTable(); }
+  try {
+    const r = await fetch(`${API}/posts/${id}`, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    if (r.ok) { await refreshTable(); }
+  } catch (e) { console.error('delPost error', e); }
 }
 
 // Gallery (GridFS)
@@ -384,16 +446,32 @@ async function refreshGallery(){
         <figcaption class="p-2 text-xs truncate">${it.filename}</figcaption>
       </figure>
     `).join('');
-  } catch { g.innerHTML = '<div class="text-sm text-gray-500">Network error.</div>'; }
+  } catch (e) {
+    console.error('refreshGallery error', e);
+    g.innerHTML = '<div class="text-sm text-gray-500">Network error.</div>';
+  }
 }
 document.getElementById('g-refresh').onclick = refreshGallery;
 
 // Users
 function refreshUsersCard(role){
   const card = document.getElementById('tab-users');
-  if (role !== 'admin') { card.classList.add('hidden'); return; }
-  card.classList.remove('hidden'); refreshUsers();
+  const usersTabBtn = document.querySelector('[data-tab="tab-users"]');
+
+  if (role !== 'admin') {
+    usersTabBtn && usersTabBtn.classList.add('hidden');
+    card.classList.add('hidden');
+    return;
+  }
+
+  // Admins: show the Users tab button (pane remains hidden until clicked)
+  usersTabBtn && usersTabBtn.classList.remove('hidden');
+  card.classList.add('hidden');
+
+  // Prefetch users in background
+  refreshUsers();
 }
+
 async function refreshUsers(){
   const body = document.getElementById('u-body');
   try{
@@ -413,9 +491,13 @@ async function refreshUsers(){
     `).join('');
     document.querySelectorAll('.u-mkadmin').forEach(b => b.onclick = () => updateUser(b.dataset.id, { role: 'admin' }));
     document.querySelectorAll('.u-del').forEach(b => b.onclick = () => deleteUser(b.dataset.id));
-  }catch{ body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Network error.</td></tr>'; }
+  }catch(e){
+    console.error('refreshUsers error', e);
+    body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Network error.</td></tr>';
+  }
 }
 document.getElementById('u-refresh').onclick = refreshUsers;
+
 document.getElementById('u-create').onclick = async () => {
   const payload = {
     email: document.getElementById('u-email').value.trim(),
@@ -423,17 +505,31 @@ document.getElementById('u-create').onclick = async () => {
     role: document.getElementById('u-role').value,
     password: document.getElementById('u-pass').value
   };
-  const r = await fetch(`${API}/users`, { method:'POST', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(payload) });
-  if (r.ok) refreshUsers();
+  try {
+    const r = await fetch(`${API}/users`, { method:'POST', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(payload) });
+    if (r.ok) refreshUsers();
+    else {
+      const j = await r.json();
+      console.warn('create user failed', j);
+    }
+  } catch (e) {
+    console.error('u-create error', e);
+  }
 };
+
 async function updateUser(id, body){
-  const r = await fetch(`${API}/users/${id}`, { method:'PUT', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
-  if (r.ok) refreshUsers();
+  try {
+    const r = await fetch(`${API}/users/${id}`, { method:'PUT', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
+    if (r.ok) refreshUsers();
+  } catch (e) { console.error('updateUser error', e); }
 }
+
 async function deleteUser(id){
   if (!confirm('Delete user?')) return;
-  const r = await fetch(`${API}/users/${id}`, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  if (r.ok) refreshUsers();
+  try {
+    const r = await fetch(`${API}/users/${id}`, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    if (r.ok) refreshUsers();
+  } catch (e) { console.error('deleteUser error', e); }
 }
 </script>
 </body>
