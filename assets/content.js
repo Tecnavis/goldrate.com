@@ -40,7 +40,15 @@
         return;
       }
 
-      const items = j.items || [];
+      let items = j.items || j || [];
+      // Keep only published (if field exists) and sort latest first
+      items = items.filter(p => p.published !== false);
+      items.sort((a,b) => {
+        const da = new Date(a.publishedAt || a.updatedAt || a.createdAt || 0).getTime();
+        const db = new Date(b.publishedAt || b.updatedAt || b.createdAt || 0).getTime();
+        return db - da;
+      });
+      items = items.slice(0, limit);
       if (!items.length) {
         box.innerHTML =
           '<div class="text-sm text-gray-500 p-4 border rounded-xl bg-white/50">No posts yet.</div>';

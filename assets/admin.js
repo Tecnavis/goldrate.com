@@ -190,7 +190,10 @@
         .join("");
 
       // Edit
-      t.querySelectorAll(".edit-post").forEach((btn) => {
+      t.addEventListener('click', async (ev) => {
+        const btn = ev.target.closest('.edit-post');
+        if (!btn) return;
+
         btn.onclick = async () => {
           const id = btn.getAttribute("data-id");
           try {
@@ -212,10 +215,13 @@
             console.error(e);
           }
         };
-      });
+            });
 
-      // Delete
-      t.querySelectorAll(".del-post").forEach((btn) => {
+      // Delete (event delegation)
+      t.addEventListener('click', async (ev) => {
+        const btn = ev.target.closest('.del-post');
+        if (!btn) return;
+
         btn.onclick = async () => {
           if (!confirm("Delete post?")) return;
           const id = btn.getAttribute("data-id");
@@ -224,7 +230,7 @@
             headers: { Authorization: `Bearer ${TOKEN}` },
           });
           refreshTable();
-        };
+                return;
       });
     } catch (e) {
       console.error(e);
