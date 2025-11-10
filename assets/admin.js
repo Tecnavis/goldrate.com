@@ -22,14 +22,13 @@
     el("app").classList.add("hidden");
     el("btn-logout").classList.add("hidden");
   }
-
   el("btn-logout").onclick = () => {
     localStorage.removeItem("goldrates_token");
     TOKEN = "";
     location.reload();
   };
 
-  // eye toggle (👁 / 🙈)
+  // Eye toggle
   (function () {
     const eye = document.getElementById("pass-eye");
     const input = document.getElementById("a-pass");
@@ -43,7 +42,7 @@
     }
   })();
 
-  // init quill
+  // Quill
   function initQuill() {
     if (quill) return;
     quill = new Quill("#quill", { theme: "snow" });
@@ -154,20 +153,17 @@
     }
   };
 
-  // Table (ADMIN list incl. drafts)
+  // Table (admin view)
   async function refreshTable() {
-    const t = el("t-body"); // <-- fixed id
+    const t = document.getElementById("t-body") || document.getElementById("posts-tbody");
     if (!t) return;
     t.innerHTML =
       '<tr><td colspan="5" class="p-3 text-sm text-gray-500">Loading...</td></tr>';
     try {
-      // Prefer admin endpoint; fallback to public if not available
       let r = await fetch(`${API}/posts/admin?limit=50&page=1`, {
         headers: { Authorization: `Bearer ${TOKEN}` },
       });
-      if (r.status === 404) {
-        r = await fetch(`${API}/posts?limit=50&page=1`); // fallback (published only)
-      }
+      if (r.status === 404) r = await fetch(`${API}/posts?limit=50&page=1`);
       const j = await r.json();
       if (!r.ok) {
         t.innerHTML =
@@ -193,7 +189,7 @@
         )
         .join("");
 
-      // bind edit
+      // Edit
       t.querySelectorAll(".edit-post").forEach((btn) => {
         btn.onclick = async () => {
           const id = btn.getAttribute("data-id");
@@ -218,7 +214,7 @@
         };
       });
 
-      // bind delete
+      // Delete
       t.querySelectorAll(".del-post").forEach((btn) => {
         btn.onclick = async () => {
           if (!confirm("Delete post?")) return;
