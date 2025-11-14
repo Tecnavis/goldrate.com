@@ -215,7 +215,7 @@
             console.error(e);
           }
         };
-            });
+      });
 
       // Delete (event delegation)
       t.addEventListener('click', async (ev) => {
@@ -230,7 +230,8 @@
             headers: { Authorization: `Bearer ${TOKEN}` },
           });
           refreshTable();
-                return;
+          return;
+        };
       });
     } catch (e) {
       console.error(e);
