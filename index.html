@@ -8,17 +8,13 @@
 <title>GoldRates — Live Gold Prices &amp; Calculator</title>
 <meta content="Real-time gold prices across karats with currency converter and price calculator." name="description"/>
 <!-- Pass API endpoint here (preferred). Put your full URL -->
-<meta name="gold-api" content="https://goldapi-my1rlotopzv3-io"/>
-<meta name="gold-api" content="https://www.goldapi.io/api"/>
-
+<meta content="https://goldapi-my1rlotopzv3-io" name="gold-api"/>
 <!-- Basic security hardening -->
 <meta content="strict-origin-when-cross-origin" http-equiv="Referrer-Policy"/>
 <meta content="nosniff" http-equiv="X-Content-Type-Options"/>
 <meta content="SAMEORIGIN" http-equiv="X-Frame-Options"/>
 <meta content="default-src 'self' https:; img-src 'self' https: data: https://goldrate-cms.onrender.com; style-src 'self' 'unsafe-inline' https:; script-src 'self' https://cdn.tailwindcss.com https://s3.tradingview.com 'unsafe-inline'; connect-src 'self' https: https://goldrate-cms.onrender.com; frame-ancestors 'self';" http-equiv="Content-Security-Policy"/>
-<!-- admin.html -->
 <meta name="cms-api" content="https://goldrate-cms.onrender.com" />
-
 <script src="assets/config.js"></script>
 <script src="assets/content.js"></script>
 
@@ -57,17 +53,10 @@
 <img alt="GoldRates" class="h-12 w-auto" src="./assets/goldrates-black.png"/>
 </a>
 <nav class="hidden md:flex items-center gap-6 text-sm">
-<a class="hover:text-amber-600" href="index.html">Home</a>
+<a class="hover:text-amber-600" href="index.html#live">Live Rates</a>
 <a class="hover:text-amber-600" href="about.html">About</a>
 <a class="hover:text-amber-600" href="contact.html">Contact</a>
-<div class="flex gap-4 text-xl">
-                <a href="https://www.facebook.com/Goldrates2025/" aria-label="Facebook" class="opacity-80 hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 5.02 3.66 9.18 8.44 9.96v-7.05H7.9v-2.91h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.87h2.74l-.44 2.91h-2.3v7.05C18.34 21.25 22 17.09 22 12.07z"/></svg></a>
-                <a href="https://x.com/GoldRates2025" aria-label="X" class="opacity-80 hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 10.7 20.4 3h-1.6l-6.1 6.9L7.3 3H3l7.3 10.4L3 21h1.6l6.6-7.4 5.7 7.4H21l-7.5-10.3z"/></svg></a>
-                <a href="https://www.linkedin.com/company/goldrates/" aria-label="LinkedIn" class="opacity-80 hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.94 6.5A2.44 2.44 0 1 0 4.5 4.06 2.43 2.43 0 0 0 6.94 6.5zM3.75 8.25h6.38V21H3.75zM13.5 8.25h6.01V12c0 4.75-2.54 6.93-5.93 6.93-1.06 0-2.27-.38-2.94-1.03V21H13.5z"/></svg></a>
-                <a href="https://www.instagram.com/goldrates2025/" aria-label="Instagram" class="opacity-80 hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 3.5A5.5 5.5 0 1 1 6.5 13 5.51 5.51 0 0 1 12 7.5zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5zm5.75-3a1.25 1.25 0 1 1-1.25 1.25A1.24 1.24 0 0 1 17.75 6.5z"/></svg></a>
-                </div>
 </nav>
-
 </div>
 </header>
 <main>
@@ -80,8 +69,8 @@
           </h1>
 <p class="mt-3 text-white/90 max-w-xl">Live prices for 24K, 22K, 18K, 14K with currency conversion. Track trends and calculate value instantly.</p>
 <div class="mt-6 flex flex-wrap gap-3">
-<a class="bg-white text-amber-700 font-medium px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition" href="#live"><button> Live Rates</button></a>
-<button class="bg-amber-700/60 hover:bg-amber-700/75 border border-white/20 font-medium px-4 py-2 shadow-sm hover:shadow-md transition rounded-lg" id="openCalc">
+<a class="bg-white text-amber-700 font-medium px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition" href="#live">View Live Rates</a>
+<button class="bg-amber-700/60 hover:bg-amber-700/75 border border-white/20 font-medium px-4 py-2 rounded-lg transition" id="openCalc">
               Open Calculator
             </button>
 </div>

@@ -1,11 +1,14 @@
-// assets/content.js
+// assets/content.js - enhanced debug version
 (function () {
   const API =
     (window.CONFIG && window.CONFIG.CMS_API) ||
     document.querySelector('meta[name="cms-api"]')?.content ||
     "";
 
-  if (!API) return;
+  if (!API) {
+    console.warn("content.js: CMS API not configured (no meta cms-api).");
+    return;
+  }
 
   const abs = (u) => {
     if (!u) return "";
@@ -15,31 +18,24 @@
 
   async function load(type, targetId, limit = 6) {
     const box = document.getElementById(targetId);
-    if (!box) return;
+    if (!box) {
+      console.debug(`content.js: target ${targetId} not found on page.`);
+      return;
+    }
 
-    // skeleton
-    box.innerHTML = Array.from({ length: Math.min(limit, 6) })
-      .map(
-        () => `
-        <div class="animate-pulse p-4 border rounded-xl bg-white/50">
-          <div class="h-40 bg-gray-200 rounded-xl mb-3"></div>
-          <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-          <div class="h-3 bg-gray-200 rounded w-2/3"></div>
-        </div>`
-      )
-      .join("");
+    box.innerHTML = '<div class="text-sm text-gray-500 p-4 border rounded-xl bg-white/50">Loading...</div>';
 
     try {
-      const r = await fetch(
-        `${API}/posts?type=${encodeURIComponent(type)}&limit=${limit}`
-      );
-      const j = await r.json();
+      const url = `${API}/posts?type=${encodeURIComponent(type)}&limit=${limit}`;
+      const r = await fetch(url);
       if (!r.ok) {
-        box.innerHTML =
-          '<div class="text-sm text-gray-500 p-4 border rounded-xl bg-white/50">Could not load items.</div>';
+        const text = await r.text().catch(()=>''); 
+        console.error(`content.js: fetch ${url} returned ${r.status}`, text);
+        box.innerHTML = `<div class="text-sm text-red-500 p-4 border rounded-xl">Could not load items (status ${r.status}).</div>`;
         return;
       }
 
+      const j = await r.json();
       let items = j.items || j || [];
       // Keep only published (if field exists) and sort latest first
       items = items.filter(p => p.published !== false);
@@ -48,6 +44,7 @@
         const db = new Date(b.publishedAt || b.updatedAt || b.createdAt || 0).getTime();
         return db - da;
       });
+
       items = items.slice(0, limit);
       if (!items.length) {
         box.innerHTML =
@@ -57,36 +54,24 @@
 
       box.innerHTML = items
         .map((p) => {
-          const img = p.coverImage ? `<img src="${abs(
-            p.coverImage
-          )}" class="w-full h-40 object-cover" alt="">` : "";
-          const href = `${type}.html#${encodeURIComponent(
-            p.slug || ""
-          )}`; // or `${type}.html?slug=${encodeURIComponent(p.slug||'')}`
-
-          return `
-          <a href="${href}" class="card p-4 border rounded-xl bg-white hover:shadow transition block">
-            <div class="h-40 w-full overflow-hidden rounded-xl bg-gray-100 mb-3">
+          const img = p.coverImage ? `<img src="${abs(p.coverImage)}" class="w-full h-40 object-cover" alt="">` : "";
+          const href = `${type}.html#${encodeURIComponent(p.slug || "")}`;
+          return `<a class="block shadow-sm rounded-xl overflow-hidden bg-white" href="${href}">
               ${img}
-            </div>
-            <div class="text-sm text-gray-500">${new Date(
-              p.publishedAt || p.createdAt
-            ).toLocaleDateString()}</div>
-            <div class="font-semibold mt-1">${p.title || ""}</div>
-            <div class="text-sm text-gray-600 line-clamp-2 mt-1">${
-              p.excerpt || ""
-            }</div>
-          </a>`;
+              <div class="p-4">
+                <div class="text-sm text-gray-500">${new Date(p.publishedAt||p.updatedAt||p.createdAt||0).toLocaleDateString()}</div>
+                <div class="font-semibold mt-1">${p.title || ''}</div>
+                <div class="text-sm text-gray-600 mt-2">${p.excerpt || ''}</div>
+              </div>
+            </a>`;
         })
         .join("");
     } catch (e) {
-      box.innerHTML =
-        '<div class="text-sm text-gray-500 p-4 border rounded-xl bg-white/50">Network error.</div>';
       console.error("content.js load error:", e);
+      box.innerHTML = `<div class="text-sm text-gray-500 p-4 border rounded-xl bg-white/50">Network error: ${e.message || e}</div>`;
     }
   }
 
-  // IDs must exist in your HTML
   load("blog", "blog-cards", 6);
   load("news", "news-cards", 6);
 })();
