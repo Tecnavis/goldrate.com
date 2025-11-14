@@ -8,13 +8,17 @@
 <title>GoldRates — Live Gold Prices &amp; Calculator</title>
 <meta content="Real-time gold prices across karats with currency converter and price calculator." name="description"/>
 <!-- Pass API endpoint here (preferred). Put your full URL -->
-<meta content="https://goldapi-my1rlotopzv3-io" name="gold-api"/>
+<meta name="gold-api" content="https://goldapi-my1rlotopzv3-io"/>
+<meta name="gold-api" content="https://www.goldapi.io/api"/>
+
 <!-- Basic security hardening -->
 <meta content="strict-origin-when-cross-origin" http-equiv="Referrer-Policy"/>
 <meta content="nosniff" http-equiv="X-Content-Type-Options"/>
 <meta content="SAMEORIGIN" http-equiv="X-Frame-Options"/>
 <meta content="default-src 'self' https:; img-src 'self' https: data: https://goldrate-cms.onrender.com; style-src 'self' 'unsafe-inline' https:; script-src 'self' https://cdn.tailwindcss.com https://s3.tradingview.com 'unsafe-inline'; connect-src 'self' https: https://goldrate-cms.onrender.com; frame-ancestors 'self';" http-equiv="Content-Security-Policy"/>
+<!-- admin.html -->
 <meta name="cms-api" content="https://goldrate-cms.onrender.com" />
+
 <script src="assets/config.js"></script>
 <script src="assets/content.js"></script>
 
@@ -76,8 +80,8 @@
           </h1>
 <p class="mt-3 text-white/90 max-w-xl">Live prices for 24K, 22K, 18K, 14K with currency conversion. Track trends and calculate value instantly.</p>
 <div class="mt-6 flex flex-wrap gap-3">
-<a class="bg-white text-amber-700 font-medium px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition" href="#live">View Live Rates</a>
-<button class="bg-amber-700/60 hover:bg-amber-700/75 border border-white/20 font-medium px-4 py-2 rounded-lg transition" id="openCalc">
+<a class="bg-white text-amber-700 font-medium px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition" href="#live"><button> Live Rates</button></a>
+<button class="bg-amber-700/60 hover:bg-amber-700/75 border border-white/20 font-medium px-4 py-2 shadow-sm hover:shadow-md transition rounded-lg" id="openCalc">
               Open Calculator
             </button>
 </div>
