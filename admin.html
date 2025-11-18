@@ -39,12 +39,10 @@
       <div class="text-sm text-gray-500 mb-2">Login</div>
       <div class="grid gap-3">
         <input id="a-email" class="border rounded-lg px-3 py-2 text-sm" placeholder="Email" />
-     <div class="relative w-full">
-  <input id="a-pass" type="password" placeholder="Password" class="border rounded-lg px-3 py-2 text-sm w-full pr-10"/>
-
-  <button type="button" id="pass-eye" class="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800">👁
-  </button>
-</div>
+        <div class="relative w-full">
+          <input id="a-pass" type="password" placeholder="Password" class="border rounded-lg px-3 py-2 text-sm w-full pr-10"/>
+          <button type="button" id="pass-eye" class="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800">👁</button>
+        </div>
         <button id="a-login" class="bg-amber-500 text-white px-4 py-2 rounded-lg">Login</button>
       </div>
       <div id="a-status" class="text-xs text-gray-500 mt-3"></div>
@@ -57,7 +55,7 @@
     <div class="flex flex-wrap gap-2">
       <button data-tab="tab-cms" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">CMS Editor</button>
       <button data-tab="tab-posts" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm">Posts Table</button>
-            <!-- Users tab hidden by default; JS will show for admin -->
+      <!-- Users tab hidden by default; JS will show for admin -->
       <button data-tab="tab-users" class="tab-btn bg-white border px-3 py-2 rounded-lg text-sm hidden">Users</button>
     </div>
 
@@ -135,7 +133,8 @@
         <div id="t-info"></div>
       </div>
     </section>
-<!-- USERS -->
+
+    <!-- USERS -->
     <section id="tab-users" class="tab-pane hidden mt-4 card p-5 rounded-2xl border bg-white">
       <div class="flex items-center justify-between mb-3">
         <div class="text-sm text-gray-500">Users</div>
@@ -175,12 +174,12 @@
   </a>
 </footer>
 
+<!-- Quill JS -->
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
 <script>
 /**
- * Admin UI (fixed)
- * - API from meta tag -> location.origin -> fallback
- * - Auto-upload + robust handlers + clear logging/status text
+ * Admin UI
  */
 
 const metaApi = document.querySelector('meta[name="gold-api"]')?.content;
@@ -206,7 +205,6 @@ function showApp(){
   document.getElementById('card-login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('btn-logout').classList.remove('hidden');
-  // Show CMS by default
   const cmsBtn = document.querySelector('[data-tab="tab-cms"]');
   cmsBtn && cmsBtn.click();
 }
@@ -230,23 +228,19 @@ async function tryResume(){
   const who = document.getElementById('whoami');
   if (!TOKEN) return showLogin();
   try{
-     const r = await fetch(`${API}/auth/me`, { headers: { Authorization: 'Bearer ' + TOKEN } });
-  if (!r.ok) {
-    console.warn('Authorization check failed', r.status);
-    return showLogin();
-  }
+    const r = await fetch(`${API}/auth/me`, { headers: { Authorization: 'Bearer ' + TOKEN } });
+    if (!r.ok) {
+      console.warn('Authorization check failed', r.status);
+      return showLogin();
+    }
     const j = await r.json();
     who.textContent = (j.user?.email || '') + (j.user?.role ? ' ('+j.user.role+')' : '');
- showApp();
+    showApp();
     initQuill('');
-    // load table/gallery and enable users tab if admin — note: users pane stays hidden until clicked
     await refreshTable();
-
-    // only refresh gallery if a gallery container exists
     if (document.getElementById('gallery')) {
       await refreshGallery();
     }
-
     refreshUsersCard(j.user?.role);
   }catch(e){
     console.error('tryResume error', e);
@@ -285,7 +279,6 @@ async function login(){
     localStorage.setItem('goldrates_token', TOKEN);
     out.textContent = 'Login successful. Loading dashboard...';
 
-    // don’t reload; just run resume logic
     await tryResume();
   }catch(e){
     console.error('Login error', e);
@@ -293,15 +286,23 @@ async function login(){
   }
 }
 document.getElementById('a-login').onclick = login;
-// Auto-upload when file chosen (better UX)
+
+// Eye toggle
+document.getElementById('pass-eye').onclick = () => {
+  const input = document.getElementById('a-pass');
+  if (!input) return;
+  const t = input.type === 'password' ? 'text' : 'password';
+  input.type = t;
+};
+
+// Auto-upload when file chosen
 document.getElementById('p-image-file').addEventListener('change', () => {
   if (document.getElementById('p-image-file').files.length) {
-    // trigger upload automatically
     document.getElementById('p-upload').click();
   }
 });
 
-// Upload to GridFS (/media endpoint)
+// Upload to /media
 document.getElementById('p-upload').onclick = async () => {
   const fileInput = document.getElementById('p-image-file');
   const file = fileInput.files[0];
@@ -314,7 +315,6 @@ document.getElementById('p-upload').onclick = async () => {
   }
 
   out.textContent = 'Uploading...';
-  console.log('Uploading file:', file.name, file.type, file.size);
 
   try {
     const fd = new FormData();
@@ -322,15 +322,13 @@ document.getElementById('p-upload').onclick = async () => {
 
     const r = await fetch(`${API}/media`, {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + TOKEN }, // DO NOT set Content-Type when sending FormData
+      headers: { 'Authorization': 'Bearer ' + TOKEN },
       body: fd
     });
 
     const respText = await r.text();
     let respJson;
     try { respJson = JSON.parse(respText); } catch { respJson = null; }
-
-    console.log('Upload response status:', r.status, respText);
 
     if (r.ok) {
       const url = respJson?.url || respText || '';
@@ -344,13 +342,13 @@ document.getElementById('p-upload').onclick = async () => {
     } else {
       const errMsg = respJson?.error || respText || `HTTP ${r.status}`;
       out.textContent = `Upload failed: ${errMsg}`;
-      console.warn('Upload failed details:', r.status, respText);
     }
   } catch (err) {
     console.error('Image upload exception:', err);
     out.textContent = 'Network error: ' + (err.message || err);
   }
 };
+
 document.getElementById('p-image-url').oninput = (e) => {
   COVER_URL = e.target.value.trim();
   const img = document.getElementById('p-image-preview');
@@ -397,8 +395,6 @@ document.getElementById('p-save').onclick = async () => {
     let respJson;
     try { respJson = JSON.parse(respText); } catch { respJson = null; }
 
-    console.log('Save response status:', r.status, respText);
-
     if (r.ok) {
       status.textContent = 'Saved.';
       if (!id && respJson && respJson._id) document.getElementById('p-id').value = respJson._id;
@@ -406,7 +402,6 @@ document.getElementById('p-save').onclick = async () => {
     } else {
       const errMsg = respJson?.error || respText || `HTTP ${r.status}`;
       status.textContent = 'Save failed: ' + errMsg;
-      console.warn('Save failed details:', r.status, respText);
     }
   } catch (err) {
     console.error('Save exception:', err);
@@ -428,7 +423,10 @@ async function refreshTable(){
   try {
     const r = await fetch(`${API}/posts/admin?${params}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
     const j = await r.json();
-    if (!r.ok) { tBody.innerHTML = '<tr><td colspan="5" class="py-3 text-gray-500">Failed to load.</td></tr>'; return; }
+    if (!r.ok) {
+      tBody.innerHTML = '<tr><td colspan="5" class="py-3 text-gray-500">Failed to load.</td></tr>';
+      return;
+    }
 
     tBody.innerHTML = j.items.map(p => `
       <tr class="border-t">
@@ -489,13 +487,10 @@ async function delPost(id){
   } catch (e) { console.error('delPost error', e); }
 }
 
-// Gallery (GridFS)
+// Gallery
 async function refreshGallery(){
   const g = document.getElementById('gallery');
-  if (!g) {
-    // no gallery section in this layout – nothing to do
-    return;
-  }
+  if (!g) return;
   try{
     const r = await fetch(`${API}/media`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
     const j = await r.json();
@@ -516,14 +511,9 @@ async function refreshGallery(){
     `).join('');
   } catch (e) {
     console.error('refreshGallery error', e);
-    if (g) g.innerHTML = '<div class="text-sm text-gray-500">Network error.</div>';
+    g.innerHTML = '<div class="text-sm text-gray-500">Network error.</div>';
   }
 }
-
-// Only hook refresh button if it exists
-const gRefreshBtn = document.getElementById('g-refresh');
-if (gRefreshBtn) gRefreshBtn.onclick = refreshGallery;
-
 
 // Users
 function refreshUsersCard(role){
@@ -536,11 +526,9 @@ function refreshUsersCard(role){
     return;
   }
 
-  // Admins: show the Users tab button (pane remains hidden until clicked)
   usersTabBtn && usersTabBtn.classList.remove('hidden');
   card.classList.add('hidden');
 
-  // Prefetch users in background
   refreshUsers();
 }
 
@@ -549,7 +537,10 @@ async function refreshUsers(){
   try{
     const r = await fetch(`${API}/users`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
     const j = await r.json();
-    if (!r.ok){ body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Failed to load.</td></tr>'; return; }
+    if (!r.ok){
+      body.innerHTML = '<tr><td colspan="4" class="py-3 text-gray-500">Failed to load.</td></tr>';
+      return;
+    }
     body.innerHTML = j.items.map(u => `
       <tr class="border-t">
         <td class="py-2 pr-4">${u.email}</td>
@@ -557,7 +548,7 @@ async function refreshUsers(){
         <td class="py-2 pr-4">${u.role}</td>
         <td class="py-2 pr-4">
           <button data-id="${u._id}" class="u-mkadmin text-amber-600 mr-3">Make Admin</button>
-          <button data-id="${u._1d}" class="u-del text-red-600">Delete</button>
+          <button data-id="${u._id}" class="u-del text-red-600">Delete</button>
         </td>
       </tr>
     `).join('');
@@ -578,7 +569,11 @@ document.getElementById('u-create').onclick = async () => {
     password: document.getElementById('u-pass').value
   };
   try {
-    const r = await fetch(`${API}/users`, { method:'POST', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(payload) });
+    const r = await fetch(`${API}/users`, {
+      method:'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN },
+      body: JSON.stringify(payload)
+    });
     if (r.ok) refreshUsers();
     else {
       const j = await r.json();
@@ -591,7 +586,11 @@ document.getElementById('u-create').onclick = async () => {
 
 async function updateUser(id, body){
   try {
-    const r = await fetch(`${API}/users/${id}`, { method:'PUT', headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
+    const r = await fetch(`${API}/users/${id}`, {
+      method:'PUT',
+      headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN },
+      body: JSON.stringify(body)
+    });
     if (r.ok) refreshUsers();
   } catch (e) { console.error('updateUser error', e); }
 }
@@ -599,13 +598,35 @@ async function updateUser(id, body){
 async function deleteUser(id){
   if (!confirm('Delete user?')) return;
   try {
-    const r = await fetch(`${API}/users/${id}`, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    const r = await fetch(`${API}/users/${id}`, {
+      method:'DELETE',
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
     if (r.ok) refreshUsers();
   } catch (e) { console.error('deleteUser error', e); }
 }
-</script>
-<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-<script src="assets/config.js"></script>
 
+/* ---- NEW: wire up posts filters ---- */
+const fRefresh = document.getElementById('f-refresh');
+if (fRefresh) fRefresh.onclick = refreshTable;
+
+const fType = document.getElementById('f-type');
+if (fType) {
+  fType.addEventListener('change', () => {
+    refreshTable();
+  });
+}
+
+const fQ = document.getElementById('f-q');
+if (fQ) {
+  fQ.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      refreshTable();
+    }
+  });
+}
+</script>
+
+<script src="assets/config.js"></script>
 </body>
 </html>
