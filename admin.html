@@ -10,8 +10,6 @@
 <!-- Set this meta to your API base. For local testing use http://localhost:4000 -->
 <meta name="gold-api" content="https://goldrate-cms.onrender.com" />
 <meta name="cms-api" content="https://goldrate-cms.onrender.com" />
-<script src="assets/config.js"></script>
-<script src="assets/admin.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-900">
 <div class="max-w-7xl mx-auto p-6">
@@ -239,11 +237,16 @@ async function tryResume(){
   }
     const j = await r.json();
     who.textContent = (j.user?.email || '') + (j.user?.role ? ' ('+j.user.role+')' : '');
-    showApp();
+ showApp();
     initQuill('');
     // load table/gallery and enable users tab if admin — note: users pane stays hidden until clicked
     await refreshTable();
-    await refreshGallery();
+
+    // only refresh gallery if a gallery container exists
+    if (document.getElementById('gallery')) {
+      await refreshGallery();
+    }
+
     refreshUsersCard(j.user?.role);
   }catch(e){
     console.error('tryResume error', e);
@@ -489,11 +492,23 @@ async function delPost(id){
 // Gallery (GridFS)
 async function refreshGallery(){
   const g = document.getElementById('gallery');
+  if (!g) {
+    // no gallery section in this layout – nothing to do
+    return;
+  }
   try{
     const r = await fetch(`${API}/media`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
     const j = await r.json();
-    if (!r.ok) { g.innerHTML = '<div class="text-sm text-gray-500">Failed to load.</div>'; return; }
-    g.innerHTML = j.items.map(it => `
+    if (!r.ok) {
+      g.innerHTML = '<div class="text-sm text-gray-500">Failed to load.</div>';
+      return;
+    }
+    const items = j.items || [];
+    if (!items.length) {
+      g.innerHTML = '<div class="text-sm text-gray-500">No media yet.</div>';
+      return;
+    }
+    g.innerHTML = items.map(it => `
       <figure class="border rounded-xl overflow-hidden">
         <img src="${API}${it.url}" class="w-full h-32 object-cover" />
         <figcaption class="p-2 text-xs truncate">${it.filename}</figcaption>
@@ -501,10 +516,14 @@ async function refreshGallery(){
     `).join('');
   } catch (e) {
     console.error('refreshGallery error', e);
-    g.innerHTML = '<div class="text-sm text-gray-500">Network error.</div>';
+    if (g) g.innerHTML = '<div class="text-sm text-gray-500">Network error.</div>';
   }
 }
-document.getElementById('g-refresh').onclick = refreshGallery;
+
+// Only hook refresh button if it exists
+const gRefreshBtn = document.getElementById('g-refresh');
+if (gRefreshBtn) gRefreshBtn.onclick = refreshGallery;
+
 
 // Users
 function refreshUsersCard(role){
@@ -587,6 +606,6 @@ async function deleteUser(id){
 </script>
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script src="assets/config.js"></script>
-<script src="assets/admin.js"></script>
+
 </body>
 </html>
