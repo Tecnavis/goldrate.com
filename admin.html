@@ -381,13 +381,19 @@ document.getElementById('p-save').onclick = async () => {
     published: document.getElementById('p-published').checked,
     coverImage: COVER_URL
   };
+
   const url = id ? `${API}/posts/${id}` : `${API}/posts`;
   const method = id ? 'PUT' : 'POST';
+
   status.textContent = 'Saving...';
+
   try {
     const r = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + TOKEN
+      },
       body: JSON.stringify(payload)
     });
 
@@ -395,19 +401,25 @@ document.getElementById('p-save').onclick = async () => {
     let respJson;
     try { respJson = JSON.parse(respText); } catch { respJson = null; }
 
+    console.log('Save response status:', r.status, respText);
+
     if (r.ok) {
       status.textContent = 'Saved.';
-      if (!id && respJson && respJson._id) document.getElementById('p-id').value = respJson._id;
+      // ✅ Clear form after save
+      clearForm();
+      // refresh table so new/updated post is visible
       await refreshTable();
     } else {
       const errMsg = respJson?.error || respText || `HTTP ${r.status}`;
       status.textContent = 'Save failed: ' + errMsg;
+      console.warn('Save failed details:', r.status, respText);
     }
   } catch (err) {
     console.error('Save exception:', err);
     status.textContent = 'Network error: ' + (err.message || err);
   }
 };
+
 
 // Table
 async function refreshTable(){
