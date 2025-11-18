@@ -5,11 +5,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>GoldRates Admin</title>
 <link rel="icon" href="assets/favicon.png" />
-<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind (enhances the design when it loads) -->
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
 <!-- Set this meta to your API base. For local testing use http://localhost:4000 -->
 <meta name="gold-api" content="https://goldrate-cms.onrender.com" />
 <meta name="cms-api" content="https://goldrate-cms.onrender.com" />
+<!-- Fallback styles if Tailwind fails -->
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f9fafb;
+      color: #111827;
+      margin: 0;
+    }
+    .admin-shell {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    .login-layout {
+      display: grid;
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+    .login-hero {
+      display: none;
+    }
+    @media (min-width: 768px) {
+      .login-layout {
+        grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+      }
+      .login-hero {
+        display: block;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        max-height: 380px;
+      }
+      .login-hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+  </style>
+
 </head>
 <body class="bg-gray-50 text-gray-900">
 <div class="max-w-7xl mx-auto p-6">
