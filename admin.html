@@ -460,10 +460,14 @@ async function refreshTable(){
 
 async function loadForEdit(id){
   try {
-    const r = await fetch(`${API}/posts/admin?page=1&limit=1&id=${id}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    const r = await fetch(`${API}/posts/admin?page=1&limit=1&id=${id}`, {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
     const j = await r.json();
     const p = j.items?.[0];
     if (!p) return;
+
+    // Fill form fields
     document.getElementById('p-id').value = p._id;
     document.getElementById('p-type').value = p.type;
     document.getElementById('p-title').value = p.title;
@@ -471,9 +475,22 @@ async function loadForEdit(id){
     document.getElementById('p-published').checked = !!p.published;
     COVER_URL = p.coverImage || '';
     document.getElementById('p-image-url').value = COVER_URL;
+
     const img = document.getElementById('p-image-preview');
-    if (COVER_URL) { img.src = COVER_URL; img.classList.remove('hidden'); } else { img.classList.add('hidden'); }
+    if (COVER_URL) {
+      img.src = COVER_URL;
+      img.classList.remove('hidden');
+    } else {
+      img.classList.add('hidden');
+    }
+
     initQuill(p.content || '');
+
+    // 👇 NEW PART: auto-switch to CMS Editor tab
+    const cmsBtn = document.querySelector('[data-tab="tab-cms"]');
+    if (cmsBtn) {
+      cmsBtn.click();   // this uses your existing tab logic
+    }
   } catch (e) {
     console.error('loadForEdit error', e);
   }
