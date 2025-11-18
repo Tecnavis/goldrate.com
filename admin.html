@@ -232,11 +232,11 @@ async function tryResume(){
   const who = document.getElementById('whoami');
   if (!TOKEN) return showLogin();
   try{
-    const r = await fetch(`${API}/auth/me`, { headers: { Authorization: 'Bearer ' + TOKEN } });
-    if (!r.ok) {
-      console.warn('Authorization check failed', r.status);
-      return showLogin();
-    }
+     const r = await fetch(`${API}/auth/me`, { headers: { Authorization: 'Bearer ' + TOKEN } });
+  if (!r.ok) {
+    console.warn('Authorization check failed', r.status);
+    return showLogin();
+  }
     const j = await r.json();
     who.textContent = (j.user?.email || '') + (j.user?.role ? ' ('+j.user.role+')' : '');
     showApp();
@@ -257,18 +257,39 @@ async function login(){
   const password = document.getElementById('a-pass').value;
   const out = document.getElementById('a-status');
   out.textContent = 'Logging in...';
+
   try{
-    const r = await fetch(`${API}/auth/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email, password })});
-    const j = await r.json();
-    if (r.ok){ TOKEN = j.token; localStorage.setItem('goldrates_token', TOKEN); location.reload(); }
-    else out.textContent = j.error || 'Login failed';
+    const r = await fetch(`${API}/auth/login`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ email, password })
+    });
+
+    const j = await r.json().catch(() => ({}));
+
+    if (!r.ok) {
+      out.textContent = j.error || `Login failed (HTTP ${r.status})`;
+      return;
+    }
+
+    if (!j.token) {
+      out.textContent = 'Login OK but no token returned from server.';
+      console.warn('Login response missing token:', j);
+      return;
+    }
+
+    TOKEN = j.token;
+    localStorage.setItem('goldrates_token', TOKEN);
+    out.textContent = 'Login successful. Loading dashboard...';
+
+    // don’t reload; just run resume logic
+    await tryResume();
   }catch(e){
     console.error('Login error', e);
     out.textContent = 'Network error: ' + (e.message || e);
   }
 }
 document.getElementById('a-login').onclick = login;
-
 // Auto-upload when file chosen (better UX)
 document.getElementById('p-image-file').addEventListener('change', () => {
   if (document.getElementById('p-image-file').files.length) {
