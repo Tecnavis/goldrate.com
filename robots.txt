@@ -1,0 +1,8 @@
+User-agent: *
+Disallow:
+
+# Optional: block any admin/cms paths if you have them
+# Disallow: /admin/
+# Disallow: /cms/
+
+Sitemap: https://www.goldrates.com/sitemap.xml

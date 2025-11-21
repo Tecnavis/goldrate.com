@@ -3,15 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GoldRates.com — Live Gold Prices & Calculator</title>
-  <meta name="description" content="Real-time gold prices across karats with currency converter and price calculator.">
+  <title>GoldRates.com — About Us</title>
+  <meta name="description" content="Learn more about GoldRates.com, your trusted source for real-time gold prices and insights.">
   <link rel="icon" href="assets/favicon.ico">
+
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Tailwind config (optional)
     tailwind.config = {
-      theme: { extend: { colors: { brand: { 500: '#f59e0b', 600: '#d97706' } }}},
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#f59e0b', 600: '#d97706' }
+          }
+        }
+      }
     };
   </script>
   <style>
@@ -20,83 +26,135 @@
     .badge-down { @apply inline-flex items-center text-red-700 bg-red-50 px-2 py-0.5 rounded-full text-xs font-medium; }
     .stat { @apply text-gray-500 text-xs; }
   </style>
-<meta name="gold-api" content="https://goldrate-cms.onrender.com"/>
+
+  <!-- Optional: same gold-api meta as home -->
+  <meta name="gold-api" content="https://goldrate-cms.onrender.com"/>
 </head>
 <body class="bg-gray-50 text-gray-900">
+
+  <!-- HEADER (same style as Home) -->
   <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-2 font-semibold">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-        GoldRates<span class="text-amber-500">.com</span>
+      <a class="flex items-center gap-3 font-semibold" href="index.html">
+        <img alt="GoldRates" class="h-12 w-auto" src="./assets/goldrates-black.png"/>
       </a>
       <nav class="hidden md:flex items-center gap-6 text-sm">
-        <a class="hover:text-amber-600" href="index.html">Live Rates</a>
+        <a class="hover:text-amber-600" href="index.html#live">Live Rates</a>
         <a class="hover:text-amber-600" href="about.html">About</a>
         <a class="hover:text-amber-600" href="contact.html">Contact</a>
+        <div class="flex gap-4 text-xl">
+          <a href="https://www.facebook.com/Goldrates2025/" aria-label="Facebook" class="opacity-80 hover:opacity-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 5.02 3.66 9.18 8.44 9.96v-7.05H7.9v-2.91h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.87h2.74l-.44 2.91h-2.3v7.05C18.34 21.25 22 17.09 22 12.07z"/>
+            </svg>
+          </a>
+          <a href="https://x.com/GoldRates2025" aria-label="X" class="opacity-80 hover:opacity-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13.5 10.7 20.4 3h-1.6l-6.1 6.9L7.3 3H3l7.3 10.4L3 21h1.6l6.6-7.4 5.7 7.4H21l-7.5-10.3z"/>
+            </svg>
+          </a>
+          <!-- Official-style LinkedIn logo -->
+          <a href="https://www.linkedin.com/company/goldrates/" aria-label="LinkedIn" class="opacity-80 hover:opacity-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708C16 15.487 15.474 16 14.825 16H1.175A1.15 1.15 0 0 1 0 14.854V1.146zM4.943 13.394V6.169H2.542v7.225h2.401zM3.74 5.155c.837 0 1.358-.554 1.358-1.248C5.083 3.198 4.577 2.66 3.756 2.66c-.822 0-1.328.538-1.343 1.247 0 .694.52 1.248 1.327 1.248h.001zm4.91 8.239h2.4V9.377c0-.216.016-.432.08-.586.175-.431.574-.878 1.243-.878.877 0 1.228.662 1.228 1.634v3.847h2.4V9.58c0-2.23-1.188-3.268-2.776-3.268-1.28 0-1.845.711-2.165 1.203h.032v-1.034h-2.4c.03.662 0 7.225 0 7.225z"/>
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/goldrates2025/" aria-label="Instagram" class="opacity-80 hover:opacity-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 3.5A5.5 5.5 0 1 1 6.5 13 5.51 5.51 0 0 1 12 7.5zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5zm5.75-3a1.25 1.25 0 1 1-1.25 1.25A1.24 1.24 0 0 1 17.75 6.5z"/>
+            </svg>
+          </a>
+        </div>
       </nav>
-      <a href="#alerts" class="text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded-lg text-sm">Get Alerts</a>
     </div>
   </header>
+
+  <!-- MAIN CONTENT -->
   <main class="max-w-3xl mx-auto px-4 md:px-6 py-12">
     <h1 class="text-3xl font-bold">About GoldRates.com</h1>
-    <p class="mt-4 text-gray-600">We provide accurate, real-time gold prices and expert insights to help individuals, investors, and traders make informed decisions.</p>
+    <p class="mt-4 text-gray-600">
+      GoldRates.com is dedicated to delivering accurate, real-time gold prices and market insights.
+      Our platform helps individuals, investors, jewelers, and traders make informed decisions with
+      transparent data, intuitive tools, and easy-to-understand analysis.
+    </p>
+    <p class="mt-3 text-gray-600">
+      We aggregate reliable market feeds, support multiple currencies, and offer calculators that
+      simplify the process of understanding gold value across different karats and weights.
+    </p>
   </main>
   
   <script src="js/main.js"></script>
 
-    <!-- FOOTER -->
-    <footer class="mt-20 bg-black text-white">
-      <div class="max-w-7xl mx-auto px-6 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-          <div>
-            <div class="flex items-center gap-3 mb-4">
-              <img src="assets/goldrates-white.png" alt="GoldRates" class="h-8 w-auto"/>
-            </div>
-            <div class="flex gap-4 text-xl">
-<a href="https://facebook.com" aria-label="Facebook" class="opacity-80 hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 5.02 3.66 9.18 8.44 9.96v-7.05H7.9v-2.91h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.87h2.74l-.44 2.91h-2.3v7.05C18.34 21.25 22 17.09 22 12.07z"/></svg></a>
-<a href="https://x.com" aria-label="X" class="opacity-80 hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 10.7 20.4 3h-1.6l-6.1 6.9L7.3 3H3l7.3 10.4L3 21h1.6l6.6-7.4 5.7 7.4H21l-7.5-10.3z"/></svg></a>
-<a href="https://linkedin.com" aria-label="LinkedIn" class="opacity-80 hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.94 6.5A2.44 2.44 0 1 0 4.5 4.06 2.43 2.43 0 0 0 6.94 6.5zM3.75 8.25h6.38V21H3.75zM13.5 8.25h6.01V12c0 4.75-2.54 6.93-5.93 6.93-1.06 0-2.27-.38-2.94-1.03V21H13.5z"/></svg></a>
-<a href="https://instagram.com" aria-label="Instagram" class="opacity-80 hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 3.5A5.5 5.5 0 1 1 6.5 13 5.51 5.51 0 0 1 12 7.5zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5zm5.75-3a1.25 1.25 0 1 1-1.25 1.25A1.24 1.24 0 0 1 17.75 6.5z"/></svg></a>
-</div>
+  <!-- FOOTER (same as Home page) -->
+  <footer class="mt-20 bg-black text-white">
+    <div class="max-w-7xl mx-auto px-6 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div>
+          <div class="flex items-center gap-0 mb-4">
+            <img src="assets/goldrates-white.png" alt="GoldRates" class="h-16 w-auto"/>
           </div>
-
-          <div>
-            <div class="uppercase tracking-wide text-gray-400 text-sm mb-3">Explore</div>
-            <ul class="space-y-2 text-gray-200">
-              <li><a href="about.html" class="hover:text-amber-400">About us</a></li>
-              <li><a href="blog.html" class="hover:text-amber-400">Blog</a></li>
-              <li><a href="news.html" class="hover:text-amber-400">Article</a></li>
-              <li><a href="contact.html" class="hover:text-amber-400">Contact</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <div class="uppercase tracking-wide text-gray-400 text-sm mb-3">Useful</div>
-            <ul class="space-y-2 text-gray-200">
-              <li><a href="#" class="hover:text-amber-400">Privacy Policy</a></li>
-              <li><a href="#" class="hover:text-amber-400">Terms Of Use</a></li>
-              <li><a href="#" class="hover:text-amber-400">Disclaimer</a></li>
-              <li><a href="#" class="hover:text-amber-400">Data Source</a></li>
-              <li><a href="#" class="hover:text-amber-400">Cookie Policy</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <div class="text-2xl font-semibold mb-3">info@goldrates.com</div>
-            <p class="text-gray-300 text-sm leading-relaxed">
-              Disclaimer: Goldrates.com provides information for general purposes only.
-              Prices, forecasts, and news may change without notice. We do not offer financial advice,
-              and users should do their own research before making investment decisions.
-            </p>
+          <div class="flex gap-4 text-xl">
+            <a href="https://www.facebook.com/Goldrates2025/" aria-label="Facebook" class="opacity-80 hover:opacity-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 5.02 3.66 9.18 8.44 9.96v-7.05H7.9v-2.91h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.87h2.74l-.44 2.91h-2.3v7.05C18.34 21.25 22 17.09 22 12.07z"/>
+              </svg>
+            </a>
+            <a href="https://x.com/GoldRates2025" aria-label="X" class="opacity-80 hover:opacity-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M13.5 10.7 20.4 3h-1.6l-6.1 6.9L7.3 3H3l7.3 10.4L3 21h1.6l6.6-7.4 5.7 7.4H21l-7.5-10.3z"/>
+              </svg>
+            </a>
+            <!-- Official-style LinkedIn logo -->
+            <a href="https://www.linkedin.com/company/goldrates/" aria-label="LinkedIn" class="opacity-80 hover:opacity-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708C16 15.487 15.474 16 14.825 16H1.175A1.15 1.15 0 0 1 0 14.854V1.146zM4.943 13.394V6.169H2.542v7.225h2.401zM3.74 5.155c.837 0 1.358-.554 1.358-1.248C5.083 3.198 4.577 2.66 3.756 2.66c-.822 0-1.328.538-1.343 1.247 0 .694.52 1.248 1.327 1.248h.001zm4.91 8.239h2.4V9.377c0-.216.016-.432.08-.586.175-.431.574-.878 1.243-.878.877 0 1.228.662 1.228 1.634v3.847h2.4V9.58c0-2.23-1.188-3.268-2.776-3.268-1.28 0-1.845.711-2.165 1.203h.032v-1.034h-2.4c.03.662 0 7.225 0 7.225z"/>
+              </svg>
+            </a>
+            <a href="https://www.instagram.com/goldrates2025/" aria-label="Instagram" class="opacity-80 hover:opacity-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 3.5A5.5 5.5 0 1 1 6.5 13 5.51 5.51 0 0 1 12 7.5zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5zm5.75-3a1.25 1.25 0 1 1-1.25 1.25A1.24 1.24 0 0 1 17.75 6.5z"/>
+              </svg>
+            </a>
           </div>
         </div>
-      </div>
-      <div class="border-t border-white/10">
-        <div class="max-w-7xl mx-auto px-6 py-4 text-sm text-gray-400">
-          © 2025 GoldRates, All Rights Reserved.
+
+        <div>
+          <div class="uppercase tracking-wide text-gray-400 text-sm mb-3">Explore</div>
+          <ul class="space-y-2 text-gray-200">
+            <li><a href="about.html" class="hover:text-amber-400">About us</a></li>
+            <li><a href="blog.html" class="hover:text-amber-400">Blog</a></li>
+            <li><a href="news.html" class="hover:text-amber-400">Article</a></li>
+            <li><a href="contact.html" class="hover:text-amber-400">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="uppercase tracking-wide text-gray-400 text-sm mb-3">Useful</div>
+          <ul class="space-y-2 text-gray-200">
+            <li><a href="privacy-policy.html" class="hover:text-amber-400">Privacy Policy</a></li>
+            <li><a href="terms-of-use.html" class="hover:text-amber-400">Terms Of Use</a></li>
+            <li><a href="disclaimer.html" class="hover:text-amber-400">Disclaimer</a></li>
+            <li><a href="data-source.html" class="hover:text-amber-400">Data Source</a></li>
+            <li><a href="cookie.html" class="hover:text-amber-400">Cookie Policy</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="text-2xl font-semibold mb-3">info@goldrates.com</div>
+          <p class="text-gray-300 text-sm leading-relaxed">
+            Disclaimer: Goldrates.com provides information for general purposes only.
+            Prices, forecasts, and news may change without notice. We do not offer financial advice,
+            and users should do their own research before making investment decisions.
+          </p>
         </div>
       </div>
-    </footer>
+    </div>
+    <div class="border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-6 py-4 text-sm text-gray-400" style="display: flex;justify-content: center;">
+        © 2025 GoldRates.com, All Rights Reserved. Development by Tecnavis.in
+      </div>
+    </div>
+  </footer>
 
 </body>
 </html>
