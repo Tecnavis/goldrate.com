@@ -16,15 +16,39 @@
 <meta content="strict-origin-when-cross-origin" http-equiv="Referrer-Policy"/>
 <meta content="nosniff" http-equiv="X-Content-Type-Options"/>
 <meta content="SAMEORIGIN" http-equiv="X-Frame-Options"/>
-<meta
-  http-equiv="Content-Security-Policy"
-  content="default-src 'self' https:;
-           img-src 'self' https: data: https://goldrate-cms.onrender.com;
-           style-src 'self' 'unsafe-inline' https:;
-           script-src 'self' https://cdn.tailwindcss.com https://s3.tradingview.com https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com 'unsafe-inline';
-           connect-src 'self' https: https://goldrate-cms.onrender.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net;
-           frame-ancestors 'self';
-           frame-src https://pagead2.googlesyndication.com https://www.youtube.com https://www.tradingview.com https://s.tradingview.com;">
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' https:;
+  img-src 'self' https: data: https://goldrate-cms.onrender.com
+           https://pagead2.googlesyndication.com
+           https://tpc.googlesyndication.com
+           https://googleads.g.doubleclick.net;
+  style-src 'self' 'unsafe-inline' https:;
+  script-src 'self'
+             'unsafe-inline'
+             https://cdn.tailwindcss.com
+             https://s3.tradingview.com
+             https://www.googletagmanager.com
+             https://www.google-analytics.com
+             https://pagead2.googlesyndication.com
+             https://googleads.g.doubleclick.net
+             https://www.googletagservices.com
+             https://adservice.google.com
+             https://adservice.google.ae;
+  connect-src 'self' https: https://goldrate-cms.onrender.com
+              https://www.google-analytics.com
+              https://pagead2.googlesyndication.com
+              https://googleads.g.doubleclick.net
+              https://adservice.google.com
+              https://adservice.google.ae;
+  frame-src https://pagead2.googlesyndication.com
+            https://googleads.g.doubleclick.net
+            https://tpc.googlesyndication.com
+            https://adservice.google.com
+            https://www.youtube.com
+            https://www.tradingview.com
+            https://s.tradingview.com;
+  frame-ancestors 'self';
+">
 
 <meta name="cms-api" content="https://goldrate-cms.onrender.com" />
 <script src="assets/config.js"></script>
